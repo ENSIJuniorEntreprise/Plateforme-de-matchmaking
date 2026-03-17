@@ -10,7 +10,7 @@ import Profile from './pages/Profile'
 import Dashboard from './pages/Dashboard'
 
 function App() {
-  const [route, setRoute] = useState('accueil')
+  const [route, setRoute] = useState('matchmaking')
 
   const renderPage = () => {
     switch (route) {
