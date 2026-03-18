@@ -1,44 +1,5 @@
-import { useState } from 'react'
-import './App.css'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Accueil from './pages/Accueil'
-import Matchmaking from './pages/Matchmaking'
-import SignIn from './pages/SignIn'
-import SignUp from './pages/SignUp'
-import Profile from './pages/Profile'
-import Dashboard from './pages/Dashboard'
+import HeroPage from './HeroPage'
 
-function App() {
-  const [route, setRoute] = useState('accueil')
-
-  const renderPage = () => {
-    switch (route) {
-      case 'matchmaking':
-        return <Matchmaking />
-      case 'signin':
-        return <SignIn />
-      case 'signup':
-        return <SignUp />
-      case 'profile':
-        return <Profile />
-      case 'dashboard':
-        return <Dashboard />
-      case 'accueil':
-      default:
-        return <Accueil />
-    }
-  }
-
-  return (
-    <div className="app-root">
-      <Navbar onNavigate={setRoute} />
-      <main>
-        {renderPage()}
-      </main>
-      <Footer />
-    </div>
-  )
+export default function App() {
+  return <Accueil />
 }
-
-export default App
