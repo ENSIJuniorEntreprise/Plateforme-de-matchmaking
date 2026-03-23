@@ -15,28 +15,28 @@ function App() {
   const renderPage = () => {
     switch (route) {
       case 'matchmaking':
-        return <Matchmaking />
+        return <Matchmaking onNavigate={setRoute} />
       case 'signin':
-        return <SignIn />
+        return <SignIn onNavigate={setRoute} />
       case 'signup':
-        return <SignUp />
+        return <SignUp onNavigate={setRoute} />
       case 'profile':
-        return <Profile />
+        return <Profile onNavigate={setRoute} />
       case 'dashboard':
-        return <Dashboard />
+        return <Dashboard onNavigate={setRoute} />
       case 'accueil':
       default:
-        return <Accueil />
+        return <Accueil onNavigate={setRoute} />
     }
   }
 
   return (
     <div className="app-root">
-      <Navbar onNavigate={setRoute} />
+      <Navbar currentPage={route} onNavigate={setRoute} hideNav={!['accueil', 'matchmaking', 'dashboard'].includes(route)} />
       <main>
         {renderPage()}
       </main>
-      <Footer />
+      {['accueil', 'matchmaking', 'dashboard'].includes(route) && <Footer />}
     </div>
   )
 }
