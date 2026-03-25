@@ -859,7 +859,7 @@ const Matchmaking = () => {
         ) : (
           <>
             <div className="mt-10 flex w-full items-center justify-between gap-4">
-              <h2 className="text-2xl font-semibold text-white sm:text-[2rem]">4 Matchs trouves</h2>
+              <h2 className="text-2xl font-semibold text-white sm:text-[2rem]">4 Matchs trouvés</h2>
               <div ref={sortMenuRef} className="relative flex items-center gap-3">
                 <button
                   type="button"
