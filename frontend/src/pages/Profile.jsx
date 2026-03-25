@@ -189,6 +189,9 @@ export default function ProfilePage() {
   const [animKey, setAnimKey] = useState(0);
   const [out, setOut]       = useState(false);
   const [dir, setDir]       = useState(1);
+  const [favori, setFavori] = useState(false);
+  const [partagerVisible, setPartagerVisible] = useState(false);
+  const [contactVisible, setContactVisible] = useState(false);
 
   function changeTab(i) {
     if (i === tab || out) return;
@@ -267,26 +270,124 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex gap-2 flex-wrap pt-1">
-              {[
-                { ic: "star",  label: "Ajouter aux favoris", outline: true },
-                { ic: "share", label: "Partager",             outline: true },
-                { ic: "chat",  label: "Contacter",            outline: false },
-              ].map(b => (
-                <button
-                  key={b.label}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:opacity-80 ${
-                    b.outline
-                      ? "border border-orange-500/60 text-orange-400 bg-transparent hover:border-orange-400"
-                      : "bg-orange-500 text-white border-none shadow-lg shadow-orange-500/30 hover:bg-orange-600"
-                  }`}
-                >
-                  <Ico n={b.ic} s={13} c={b.outline ? "#fb923c" : "#fff"} />
-                  {b.label}
-                </button>
-              ))}
-            </div>
+{/* Action buttons */}
+<div className="flex gap-2 flex-wrap pt-1">
+
+  {/* Ajouter aux favoris */}
+  <button
+    onClick={() => setFavori(!favori)}
+    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 border ${
+      favori
+        ? "bg-orange-500 text-white border-orange-500"
+        : "border-orange-500/60 text-orange-400 bg-transparent"
+    }`}
+  >
+    {favori ? "✓" : <Ico n="star" s={13} c="#fb923c" />}
+    {favori ? "Ajouté aux favoris" : "Ajouter aux favoris"}
+  </button>
+
+  {/* Partager */}
+  <button
+    onClick={() => setPartagerVisible(true)}
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-orange-500/60 text-orange-400 bg-transparent hover:border-orange-400 transition-all duration-200"
+  >
+    <Ico n="share" s={13} c="#fb923c" />
+    Partager
+  </button>
+
+  {/* Contacter */}
+  <button
+    onClick={() => setContactVisible(true)}
+    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-200"
+  >
+    <Ico n="chat" s={13} c="#fff" />
+    Contacter
+  </button>
+
+</div>
+
+{/* Modal Partager */}
+{partagerVisible && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-[#1a1d27] rounded-2xl p-6 w-80 border border-white/10 shadow-2xl">
+      <h3 className="text-white font-bold text-lg mb-5 text-center">Partager via</h3>
+      <div className="flex justify-center gap-6 mb-6">
+
+        {/* Facebook */}
+        <a href="https://www.facebook.com/login" target="_blank" rel="noreferrer"
+          className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-2xl bg-[#1877F2] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+            </svg>
+          </div>
+          <span className="text-xs text-gray-400 group-hover:text-white transition-colors">Facebook</span>
+        </a>
+
+        {/* Instagram */}
+        <a href="https://www.instagram.com/accounts/login" target="_blank" rel="noreferrer"
+          className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200"
+            style={{ background: "linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/>
+            </svg>
+          </div>
+          <span className="text-xs text-gray-400 group-hover:text-white transition-colors">Instagram</span>
+        </a>
+
+        {/* LinkedIn */}
+        <a href="https://www.linkedin.com/login" target="_blank" rel="noreferrer"
+          className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-2xl bg-[#0A66C2] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </div>
+          <span className="text-xs text-gray-400 group-hover:text-white transition-colors">LinkedIn</span>
+        </a>
+
+      </div>
+      <button
+        onClick={() => setPartagerVisible(false)}
+        className="w-full py-2 rounded-xl text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors"
+      >
+        Fermer
+      </button>
+    </div>
+  </div>
+)}
+
+{/* Modal Contacter */}
+{contactVisible && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-[#1a1d27] rounded-2xl p-6 w-full max-w-md border border-white/10 shadow-2xl">
+      <h3 className="text-white font-bold text-lg mb-4">Contacter TechFlow AI</h3>
+      <textarea
+        className="w-full bg-[#0f1117] text-white text-sm rounded-xl p-3 border border-white/10 resize-none outline-none focus:border-orange-500 transition-colors"
+        rows={4}
+        placeholder="Écrivez votre message..."
+      />
+      <div className="flex gap-3 mt-4 justify-end">
+        <button
+          onClick={() => setContactVisible(false)}
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors"
+        >
+          Annuler
+        </button>
+        <button
+          onClick={() => setContactVisible(false)}
+          className="px-4 py-2 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+        >
+          Envoyer
+        </button>
+      </div>
+    </div>
+  </div>
+)}
           </div>
         </div>
 
