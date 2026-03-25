@@ -33,3 +33,219 @@ body {
 button {
   font: inherit;
 }
+
+.matchmaking-shell {
+  animation: matchmaking-page-in 0.7s ease-out;
+}
+
+.matchmaking-header {
+  animation: matchmaking-fade-up 0.7s ease-out both;
+}
+
+.matchmaking-step-item {
+  animation: matchmaking-fade-up 0.55s ease-out both;
+}
+
+.matchmaking-panel {
+  animation: matchmaking-fade-up 0.65s ease-out both;
+}
+
+.matchmaking-card {
+  animation: matchmaking-fade-up 0.6s ease-out both;
+}
+
+.matchmaking-dropdown-panel {
+  animation: matchmaking-menu-in 0.22s ease-out both;
+  transform-origin: top;
+}
+
+.matchmaking-chip {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.matchmaking-chip:hover {
+  transform: translateY(-1px);
+}
+
+.matchmaking-button {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    opacity 0.22s ease;
+}
+
+.matchmaking-button:hover {
+  transform: translateY(-2px);
+}
+
+.matchmaking-button:active {
+  transform: translateY(0);
+}
+
+.matchmaking-button-primary:hover {
+  box-shadow: 0 16px 30px rgba(255, 112, 51, 0.32);
+}
+
+.matchmaking-button-muted:hover {
+  box-shadow: 0 12px 24px rgba(163, 167, 179, 0.22);
+}
+
+.matchmaking-soft-bob {
+  animation: matchmaking-soft-bob 5.4s ease-in-out infinite;
+}
+
+.matchmaking-loader-shell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: matchmaking-fade-up 0.5s ease-out both;
+}
+
+.matchmaking-loader-shell .svg-frame {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.matchmaking-loader-shell .svg-frame svg {
+  position: absolute;
+  transition: transform 0.5s ease;
+  z-index: calc(1 - (0.2 * var(--j)));
+  transform-origin: center;
+  width: 344px;
+  height: 344px;
+  fill: none;
+  overflow: visible;
+}
+
+.matchmaking-loader-shell .svg-frame #out2 {
+  animation: matchmaking-loader-rotate 7s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.matchmaking-loader-shell .svg-frame #out3 {
+  animation: matchmaking-loader-rotate 3.2s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.matchmaking-loader-shell .svg-frame #inner3,
+.matchmaking-loader-shell .svg-frame #inner1 {
+  animation: matchmaking-loader-rotate 4.4s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.matchmaking-loader-shell .svg-frame #center1 {
+  animation: matchmaking-loader-rotate 2.2s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.matchmaking-loader-shell .svg-frame #center {
+  transform-origin: center;
+  animation: matchmaking-loader-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes matchmaking-loader-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes matchmaking-loader-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.matchmaking-result-card {
+  animation: matchmaking-card-float 4.8s ease-in-out infinite;
+  will-change: transform;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 18px 42px rgba(255, 255, 255, 0.18),
+    0 0 34px rgba(255, 255, 255, 0.26);
+}
+
+.matchmaking-result-card:hover {
+  animation-play-state: paused;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.82),
+    0 24px 54px rgba(255, 255, 255, 0.22),
+    0 0 46px rgba(255, 255, 255, 0.34);
+}
+
+@keyframes matchmaking-card-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes matchmaking-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes matchmaking-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes matchmaking-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes matchmaking-soft-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
