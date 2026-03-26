@@ -119,7 +119,7 @@ function SkillBar({ label, value, delay, run }) {
   return (
     <div className="mb-5">
       <div className="flex justify-between mb-1.5">
-        <span className="text-sm font-bold text-gray-800">{label}</span>
+        <span className="text-base font-bold text-gray-800">{label}</span>
         <span className="text-sm font-bold text-orange-500">{value}%</span>
       </div>
       <div className="h-2 bg-gray-300 rounded-full overflow-hidden">
@@ -174,8 +174,8 @@ function TimelineItem({ date, title, desc, isLast, idx, run }) {
       </div>
       <div className="pb-6">
         <span className="text-[11px] text-orange-500 font-bold tracking-widest uppercase">{date}</span>
-        <p className="text-sm font-bold text-gray-800 mt-0.5">{title}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+        <p className="text-base font-bold text-gray-800 mt-0.5">{title}</p>
+        <p className="text- text-gray-500 mt-0.5">{desc}</p>
       </div>
     </div>
   );
@@ -207,12 +207,18 @@ export default function ProfilePage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
-        * { font-family: 'Outfit', sans-serif; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popUp {
+  from { opacity: 0; transform: scale(0.85) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
       `}</style>
 
       <div className="min-h-screen bg-[#0f1117] p-5">
@@ -221,8 +227,7 @@ export default function ProfilePage() {
         <div className="rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl mb-5">
 
           {/* Banner */}
-          <div
-            className="h-32 relative overflow-visible"
+          <div className="h-32 sm:h-40 lg:h-48 relative overflow-visible"
             style={{ background: "linear-gradient(130deg, #3b1208 0%, #6b2009 30%, #7c2d12 55%, #4a1609 80%, #2d0d05 100%)" }}
           >
             {/* Glow overlay */}
@@ -234,29 +239,29 @@ export default function ProfilePage() {
 
             {/* Avatar — centered vertically on the banner */}
             <div
-              className="absolute left-5 flex items-center justify-center rounded-2xl z-10"
+              className="absolute left-3 sm:left-5 flex items-center justify-center rounded-2xl z-10"
               style={{
                 top: "50%", transform: "translateY(-50%)",
-                width: 78, height: 78,
+                width: 100, height: 100,
                 background: "#f97316",
                 border: "3px solid #f97316",
                 boxShadow: "0 4px 24px rgba(249,115,22,0.6)",
               }}
             >
-              <span className="text-white font-extrabold text-xl tracking-tight">TF</span>
+              <span className="text-white font-extrabold text-3xl tracking-tight">TF</span>
             </div>
           </div>
 
           {/* Info bar */}
-          <div className="bg-[#1a1d27] flex flex-wrap items-start gap-4 pl-28 pr-5 py-3">
+          <div className="bg-[#1a1d27] flex flex-wrap items-start gap-4 pl-5 sm:pl-20 pr-5 py-3">
 
             {/* Name + meta */}
             <div className="flex-1 min-w-[180px]">
-              <h1 className="text-white text-xl font-extrabold tracking-tight">TechFlow AI</h1>
-              <p className="text-gray-400 text-xs mt-0.5">Solution d'automatisation des workflows par IA générative</p>
+              <h1 className="text-white text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">TechFlow AI</h1>
+              <p className="text-gray-400 text-xm mt-0.5">Solution d'automatisation des workflows par IA générative</p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                 {[["location","Paris, France"],["calendar","Fondée en 2023"],["users","11-50 employés"]].map(([ic, txt]) => (
-                  <span key={txt} className="flex items-center gap-1 text-[11px] text-gray-400">
+                  <span key={txt} className="flex items-center gap-1 text-[15px] text-gray-400">
                     <Ico n={ic} s={12} c="#9ca3af" />{txt}
                   </span>
                 ))}
@@ -271,12 +276,12 @@ export default function ProfilePage() {
             </div>
 
 {/* Action buttons */}
-<div className="flex gap-2 flex-wrap pt-1">
+<div className="flex gap-2 flex-wrap pt-1 w-full lg:w-auto">
 
   {/* Ajouter aux favoris */}
   <button
     onClick={() => setFavori(!favori)}
-    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 border ${
+    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xm font-semibold transition-all duration-200 border ${
       favori
         ? "bg-orange-500 text-white border-orange-500"
         : "border-orange-500/60 text-orange-400 bg-transparent"
@@ -308,8 +313,10 @@ export default function ProfilePage() {
 
 {/* Modal Partager */}
 {partagerVisible && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-[#1a1d27] rounded-2xl p-6 w-80 border border-white/10 shadow-2xl">
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+  style={{ animation: "fadeIn 0.2s ease" }}>
+  <div className="bg-[#1a1d27] rounded-2xl p-6 w-80 border border-white/10 shadow-2xl"
+    style={{ animation: "popUp 0.3s cubic-bezier(0.34,1.56,0.64,1)" }}>
       <h3 className="text-white font-bold text-lg mb-5 text-center">Partager via</h3>
       <div className="flex justify-center gap-6 mb-6">
 
@@ -392,7 +399,7 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Main layout ── */}
-        <div className="flex gap-4 items-start">
+        <div className="flex flex-col lg:flex-row gap-4 items-start">
 
           {/* Left: tabs + content */}
           <div className="flex-1 min-w-0">
@@ -430,7 +437,7 @@ export default function ProfilePage() {
                   {DATA.about.map((p, i) => (
                     <p
                       key={i}
-                      className={`text-sm leading-relaxed text-gray-600 mb-3 ${i === 0 ? "font-semibold" : "font-normal"}`}
+                      className={`text-base leading-relaxed text-gray-600 mb-3 ${i === 0 ? "font-semibold" : "font-normal"}`}
                       style={{ opacity: 0, animation: `fadeUp 0.42s ease ${i * 90}ms forwards` }}
                     >
                       {p}
@@ -467,7 +474,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Right sidebar */}
-          <div className="w-52 shrink-0">
+          <div className="w-full lg:w-52 lg:shrink-0">
             <MatchScore score={DATA.matchScore} />
             <Accomplishments items={DATA.accomplishments} />
           </div>
