@@ -10,7 +10,7 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
 
   return (
     
-        <div className="bg-[#222834] p-8 rounded-3xl w-[600px] border border-[#FF6611]">
+        <div className="bg-[#222834] p-8 rounded-3xl w-[700px] border border-[#FF6611] ml-30">
       <form onSubmit={handleSubmit}>
         <h1 className="text-3xl font-bold mb-2 text-white ">Votre organisation</h1>
         <h4 className="mb-6 text-[#94A3B8] text-sm">Parlez-nous de votre entreprise ou projet</h4>
@@ -23,7 +23,7 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
             required
             value={form.Entreprise}
             onChange={setvalues}
-            className="p-3 rounded-xl mb-3 mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white w-[300px]"
+            className="p-3 rounded-xl mb-3 mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white w-[350px]"
           />
         </div>
 
@@ -35,7 +35,7 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
             required
             value={form.Localisation}
             onChange={setvalues}
-            className="p-3 rounded-xl mb-1 mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white w-[300px]"
+            className="p-3 rounded-xl mb-1 mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white w-[350px]"
           />
         </div>
 
@@ -48,7 +48,7 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
             required
             value={form.Lien}
             onChange={setvalues}
-            className="w-[400px] mb-3 mt-1 p-3 rounded-xl placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
+            className="w-[450px] mb-3 mt-1 p-3 rounded-xl placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
           />
         </div>
 
@@ -60,7 +60,7 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
             required
             value={form.Description}
             onChange={setvalues}
-            className="w-[400px] mb-8 mt-1 h-[100px] pb-13 pl-3 rounded-xl placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white "
+            className="w-[450px] mb-8 mt-1 h-[100px] pb-13 pl-3 rounded-xl placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white "
           />
         </div>
 

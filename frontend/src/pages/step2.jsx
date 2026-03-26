@@ -1,4 +1,4 @@
-function Formulaire({ form, setform, nextStep }) {
+function Formulaire({ form, setform, nextStep,prevStep }) {
   const setvalues = (e) => {
     setform({ ...form, [e.target.name]: e.target.value });
   };
@@ -10,7 +10,7 @@ function Formulaire({ form, setform, nextStep }) {
 
   return (
     
-  <div className="bg-[#222834] p-8 rounded-2xl mt-15 w-[600px] border border-[#FF6611]">
+  <div className="bg-[#222834] p-8 rounded-2xl mt-15 w-[700px] border border-[#FF6611] ml-25">
     <form onSubmit={handleSubmit}>
       <h1 className="text-2xl font-bold mb-1 text-white">Créez votre compte</h1>
       <h4 className="mb-6 text-[#94A3B8] text-sm">Quelques informations pour commencer</h4>
@@ -77,6 +77,7 @@ function Formulaire({ form, setform, nextStep }) {
       <div className="flex justify-between">
         <button
           type="button"
+          onClick={prevStep}
           className="text-white px-6 py-2 rounded-[10px] border border-orange-500 hover:bg-orange-500 transition w-[125px]"
         >
           ← Retour

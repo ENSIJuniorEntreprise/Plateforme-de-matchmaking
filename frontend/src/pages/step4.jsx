@@ -26,7 +26,7 @@ function Update({ prevStep, form, setform }) {
 
   return (
    
-        <div className="bg-[#222834] p-8 mt-15 rounded-2xl w-[600px] border border-[#FF6611] w-[500px] h-[400px]">
+        <div className="bg-[#222834] p-8 mt-15 rounded-2xl w-[700px] border border-[#FF6611]  h-[400px] ml-27">
       <form onSubmit={submit}>
         <h1 className="text-3xl font-bold mb-2 text-white">Vos centres d'intérêt</h1>
         <h4 className="mb-6 text-[#94A3B8] text-sm">Sélectionnez les secteurs qui vous intéressent</h4>

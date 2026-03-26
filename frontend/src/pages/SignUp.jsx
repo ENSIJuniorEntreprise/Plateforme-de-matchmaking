@@ -2,6 +2,7 @@ import { useState } from "react";
 import Formulaire from "./step2";
 import Formulaire2 from "./step3";
 import Update from "./step4";
+import Choose from "./step1";
 
 function ProgressBar({ step }) {
   const totalSteps = 4;
@@ -27,10 +28,11 @@ function ProgressBar({ step }) {
   );
 }
 
-function signUp() {
+function SignUp() {
   const [step, setStep] = useState(1);
 
   const [form, setform] = useState({
+    role:"",
     Prenom: "",
     Nom: "",
     Email: "",
@@ -47,9 +49,9 @@ function signUp() {
 
   return (
     <div className="bg-[#20222C] w-screen min-h-screen flex flex-col items-center p-6">
-      <div className="w-[600px]">
+      <div className="w-[900px] ">
         <ProgressBar step={step} />
-        {step === 1 && <Formulaire form={form} setform={setform} nextStep={nextStep} />}
+        {step === 1 && < Choose form={form} setform={setform} nextStep={nextStep} />}
         {step === 2 && <Formulaire form={form} setform={setform} nextStep={nextStep} prevStep={prevStep} />}
         {step === 3 && <Formulaire2 form={form} setform={setform} prevStep={prevStep} nextStep={nextStep}/>}
         {step === 4 && <Update form={form} setform={setform} prevStep={prevStep} />}
@@ -57,4 +59,4 @@ function signUp() {
     </div>
   );
 }
-export default signUp;
+export default SignUp;
