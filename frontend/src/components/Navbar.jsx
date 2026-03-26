@@ -8,7 +8,7 @@ const DASHBOARD_PAGES = ["profile", "settings" , "forgot-password" , "reset-pass
 const DEFAULT_PAGES = ["accueil", "matchmaking", "dashboard"];
 
 const NAVBAR_VARIANTS = {
-  default: {
+  default: { 
     headerHeight: 102,
     innerMarginTop: 25,
   },
@@ -150,16 +150,6 @@ const globalCSS = `
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-/**
- * Navbar
- *
- * Props:
- *   currentPage  — active route string (e.g. "accueil", "signin")
- *   onNavigate   — callback(pageId) fired on navigation
- *   hideNav      — hides the centre pill nav
- *   variant      — (optional) "default" | "auth"
- *                  Omit to let the component auto-detect from currentPage.
- */
 export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
   useIonicons();
   const [active, setActive] = useState(currentPage || "accueil");
@@ -173,11 +163,14 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
     if (onNavigate) onNavigate(id);
   };
 
+  // ✅ Fix : utilise currentPage (prop, source de vérité de App)
+  // et non active (état local qui peut être désynchronisé sur les pages dashboard/auth)
   const handleLogoClick = () => {
-    if (active === "accueil") {
+    if (currentPage === "accueil") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      handleNav("accueil");
+      if (onNavigate) onNavigate("accueil");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -186,11 +179,7 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
   const resolvedVariant = variant ?? getVariant(currentPage);
   const { headerHeight, innerMarginTop } = NAVBAR_VARIANTS[resolvedVariant];
 
-  // ── Button visibility per page ──────────────────────────────────────────────
   const { showConnexion, showCommencer } = getRightButtons(active);
-
-  // On auth pages with a single button, push it to the far right with margin-left: auto.
-  // On other pages, keep the normal flex gap layout.
   const isSingleAuthButton = (active === "signin" || active === "signup");
 
   return (

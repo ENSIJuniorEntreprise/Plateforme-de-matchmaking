@@ -4,7 +4,7 @@ export default function Accueil({ onNavigate }) {
   return (
     <section
       id="top"
-      style={{
+      style={{ 
         minHeight: "100vh",
         background: "linear-gradient(to bottom, #1a1d23, #20222C)",
         display: "flex",

@@ -53,7 +53,12 @@ const globalCSS = `
   }
 `;
 
-export default function Footer() {
+export default function Footer({ onNavigate }) {
+  const handleLogoClick = () => {
+    if (onNavigate) onNavigate("accueil");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <>
       <style>{globalCSS}</style>
@@ -61,9 +66,9 @@ export default function Footer() {
       <footer style={styles.footer}>
         <div style={styles.inner}>
 
-          {/* Colonne gauche : logo + description + contacts — justifySelf: "start" comme la navbar */}
+          {/* Colonne gauche : logo + description + contacts */}
           <div style={styles.colLeft}>
-            <div style={styles.logo}>
+            <div style={styles.logo} onClick={handleLogoClick}>
               <div style={styles.logoIcon}>
                 <Sparkles size={20} color="white" strokeWidth={2} />
               </div>
@@ -139,7 +144,7 @@ export default function Footer() {
             <a className="footer-link">Cookies</a>
           </div>
 
-          {/* Colonne Suivez-nous — justifySelf: "end" comme les boutons Navbar */}
+          {/* Colonne Suivez-nous */}
           <div style={styles.colRight}>
             <p style={styles.suivezNous}>Suivez-nous</p>
             <div style={styles.socialRow}>
@@ -192,7 +197,7 @@ const styles = {
   colLeft: {
     display: "flex",
     flexDirection: "column",
-    justifySelf: "start",                  // colle à gauche — comme le logo Navbar
+    justifySelf: "start",
     maxWidth: "300px",
   },
   col: {

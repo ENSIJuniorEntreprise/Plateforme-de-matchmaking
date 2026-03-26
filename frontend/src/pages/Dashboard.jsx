@@ -208,7 +208,7 @@ export default function Dashboard({ onNavigate }) {
           <p style={{ color: "#6b7280", fontSize: "0.83rem", margin: "0 0 22px" }}>Complétez votre profil pour améliorer vos matchs</p>
           <button className="dash-profile-btn" onClick={() => onNavigate && onNavigate("profile")}>
             <Zap size={15} strokeWidth={2.5} /> Voir mon profil
-          </button>
+          </button> 
         </div>
 
       </div>

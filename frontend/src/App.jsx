@@ -32,11 +32,17 @@ function App() {
 
   return (
     <div className="app-root">
-      <Navbar currentPage={route} onNavigate={setRoute} hideNav={!['accueil', 'matchmaking', 'dashboard'].includes(route)} />
+      <Navbar
+        currentPage={route}
+        onNavigate={setRoute}
+        hideNav={!['accueil', 'matchmaking', 'dashboard'].includes(route)}
+      />
       <main>
         {renderPage()}
       </main>
-      {['accueil', 'matchmaking', 'dashboard'].includes(route) && <Footer />}
+      {['accueil', 'matchmaking', 'dashboard'].includes(route) && (
+        <Footer onNavigate={setRoute} />
+      )}
     </div>
   )
 }
