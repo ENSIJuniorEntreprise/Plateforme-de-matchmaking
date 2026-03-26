@@ -112,7 +112,7 @@ function MatchingGraph() {
         grd.addColorStop(0, color+"33"); grd.addColorStop(1, "transparent");
         ctx.beginPath(); ctx.arc(x,y,r*2,0,Math.PI*2); ctx.fillStyle = grd; ctx.fill();
         ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-        ctx.fillStyle = "#1a2035"; ctx.fill();
+        ctx.fillStyle = "#20222C"; ctx.fill();
         ctx.strokeStyle = color+"99"; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = "#fff"; ctx.font = `bold ${r*0.65}px 'Sora',sans-serif`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(n.id.slice(0,2), x, y);
@@ -213,7 +213,7 @@ function FeatureCard({ icon, title, desc, index }) {
 export default function HeroPage() {
   return (
     <div style={{
-      background: "linear-gradient(160deg, #20222C , #20222C 40%, #0c1320 100%)",
+      background: "linear-gradient(160deg, #20222C , #20222C 40%, #20222C 100%)",
       fontFamily: "'Sora', sans-serif",
       color: "#fff",
       overflowX: "hidden",
@@ -344,7 +344,7 @@ export default function HeroPage() {
 
       {/* ══════════ SECTION 3 — POURQUOI MATCHHUB ══════════ */}
       <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "120px 48px", position: "relative" }}>
-        <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: "radial-gradient(ellipse, rgba(249,115,22,0.07) 0%, transparent 70%)", pointerEvents: "none", zIndex: 1 }} />
+        <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: "radial-gradient(ellipse, #20222C,80%)", pointerEvents: "none", zIndex: 1 }} />
 
         <div className="fade-up-8" style={{ textAlign: "center", marginBottom: "64px", position: "relative", zIndex: 2 }}>
           <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>

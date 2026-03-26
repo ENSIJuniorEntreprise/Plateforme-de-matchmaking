@@ -99,9 +99,9 @@ export default function CallToAction() {
           }}
         >
           Prêt à trouver votre{" "}
-          <span style={{ color: "#FF540B" }}>match</span>
+          <span style={{ color: "#FF540B" }}>match parfait </span>
           <br />
-          <span style={{ color: "#FF540B" }}>parfait</span> ?
+        
         </h2>
 
         {/* Subtitle */}
