@@ -412,8 +412,8 @@ const AnalysisLoader = () => (
   </div>
 )
 
-const Matchmaking = () => {
-  const [currentStep, setCurrentStep] = useState(2)
+const Matchmaking = ({ onNavigate }) => {
+  const [currentStep, setCurrentStep] = useState(1)
   const [selectedProfile, setSelectedProfile] = useState('startup')
   const [activeStage, setActiveStage] = useState('')
   const [selectedSectors, setSelectedSectors] = useState([])
@@ -605,7 +605,7 @@ const Matchmaking = () => {
                     setSelectedProfile(option.id)
                     setCurrentStep(2)
                   }}
-                  className="matchmaking-card matchmaking-button group h-[250px] w-full rounded-[2rem] border border-transparent bg-[#2F3241] px-7 py-10 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-1 hover:border-[#FF7033] hover:bg-[rgba(255,112,51,0.10)]"
+                  className="matchmaking-card matchmaking-profile-card matchmaking-button group h-[250px] w-full rounded-[2rem] border border-transparent bg-[#2F3241] px-7 py-10 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-500 hover:-translate-y-1 hover:border-[#FF7033] hover:bg-[rgba(255,112,51,0.10)]"
                   style={{ animationDelay: `${0.12 * index}s` }}
                 >
                   <div className="flex h-full w-full flex-col items-center justify-center">
@@ -633,7 +633,11 @@ const Matchmaking = () => {
                 <ChevronDownIcon className="h-4 w-4 -rotate-90" />
               </button>
 
-              <div className="matchmaking-panel rounded-[1.65rem] border border-[rgba(143,146,159,0.5)] bg-[#434656] px-5 py-5 sm:px-7">
+              <div
+                className={`matchmaking-panel relative rounded-[1.65rem] border border-[rgba(143,146,159,0.5)] bg-[#434656] px-5 py-5 sm:px-7 ${
+                  isSectorMenuOpen ? 'z-40' : 'z-10'
+                }`}
+              >
                 <div className="flex items-center gap-3 text-white">
                   <IconImage src={starbarsImage} alt="" className="h-5 w-5" />
                   <h3 className="text-[1.15rem] font-semibold sm:text-[1.8rem]">Secteurs d'activité</h3>
@@ -666,7 +670,7 @@ const Matchmaking = () => {
                   </button>
 
                   {isSectorMenuOpen ? (
-                    <div className="matchmaking-dropdown-panel absolute left-0 right-0 top-[calc(100%+12px)] z-20 rounded-[1.3rem] border border-[rgba(143,146,159,0.35)] bg-[#2F3241] p-3 shadow-[0_20px_40px_rgba(0,0,0,0.28)]">
+                    <div className="matchmaking-dropdown-panel absolute left-0 right-0 top-[calc(100%+12px)] z-50 rounded-[1.3rem] border border-[rgba(143,146,159,0.35)] bg-[#2F3241] p-3 shadow-[0_20px_40px_rgba(0,0,0,0.28)]">
                       <div className="flex flex-wrap gap-2">
                         {sectorOptions.map((sector) => {
                           const isSelected = selectedSectors.includes(sector)
@@ -692,7 +696,7 @@ const Matchmaking = () => {
                 </div>
               </div>
 
-              <div className="mt-12 grid gap-8 lg:grid-cols-2">
+              <div className="relative z-0 mt-12 grid gap-8 lg:grid-cols-2">
                 <div className="matchmaking-panel rounded-[1.65rem] border border-[rgba(143,146,159,0.5)] bg-[#434656] px-5 py-5 sm:px-7">
                   <div className="flex items-center gap-3 text-white">
                     <IconImage src={wrenchImage} alt="" className="h-5 w-5" />
@@ -899,7 +903,7 @@ const Matchmaking = () => {
               {sortedMatches.map((match, index) => (
                 <article
                   key={match.id}
-                  className="matchmaking-result-card group rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24] transition duration-300 hover:-translate-y-2"
+                  className="matchmaking-result-card group rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24] transition duration-500 hover:-translate-y-2"
                   style={{ animationDelay: `${index * 0.45}s` }}
                 >
                   <div className="flex items-start gap-4">
@@ -953,6 +957,7 @@ const Matchmaking = () => {
                   <div className="mt-5 overflow-hidden transition-all duration-300 max-sm:max-h-14 sm:max-h-0 sm:opacity-0 sm:group-hover:max-h-20 sm:group-hover:opacity-100">
                     <button
                       type="button"
+                      onClick={() => onNavigate?.('profile')}
                       className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#FF7033] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.24)] transition hover:bg-[#FF7B45]"
                     >
                       <StarOutlineIcon className="h-4 w-4" />

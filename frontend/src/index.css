@@ -54,6 +54,10 @@ button {
   animation: matchmaking-fade-up 0.6s ease-out both;
 }
 
+.matchmaking-profile-card {
+  transition-duration: 0.48s;
+}
+
 .matchmaking-dropdown-panel {
   animation: matchmaking-menu-in 0.22s ease-out both;
   transform-origin: top;
@@ -176,8 +180,11 @@ button {
 }
 
 .matchmaking-result-card {
-  animation: matchmaking-card-float 4.8s ease-in-out infinite;
+  animation: matchmaking-card-float 7.6s ease-in-out infinite;
   will-change: transform;
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.72),
     0 18px 42px rgba(255, 255, 255, 0.18),

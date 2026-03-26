@@ -15,7 +15,7 @@ function App() {
   const renderPage = () => {
     switch (route) {
       case 'matchmaking':
-        return <Matchmaking />
+        return <Matchmaking onNavigate={setRoute} />
       case 'signin':
         return <SignIn />
       case 'signup':
