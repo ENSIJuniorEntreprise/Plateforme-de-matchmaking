@@ -64,7 +64,7 @@ function StarCanvas() {
 function Stat({ value, label }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-      <span style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, color: "#f97316", letterSpacing: "-0.02em" }}>{value}</span>
+      <span style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, color: "#FF540B", letterSpacing: "-0.02em" }}>{value}</span>
       <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem" }}>{label}</span>
     </div>
   );
@@ -91,7 +91,7 @@ function MatchingGraph() {
       { id: "FU", label: "Fund A",     type: "investisseur", x: 0.65, y: 0.82 },
     ];
     const edges = [[0,5],[0,1],[0,3],[1,3],[1,4],[2,6],[2,7],[4,5],[5,6],[2,4]];
-    const typeColor = { startup: "#f97316", talent: "#38bdf8", investisseur: "#34d399" };
+    const typeColor = { startup: "#FF540B", talent: "#38bdf8", investisseur: "#34d399" };
     const draw = () => {
       t += 0.008;
       const w = canvas.width, h = canvas.height;
@@ -130,7 +130,7 @@ function MatchingGraph() {
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", overflow: "hidden", padding: "16px" }}>
         <canvas ref={canvasRef} style={{ width: "100%", height: "420px", display: "block" }} />
         <div style={{ display: "flex", gap: "24px", padding: "12px 16px 4px" }}>
-          {[["#f97316","Startup"],["#38bdf8","Talent"],["#34d399","Investisseur"]].map(([color, label]) => (
+          {[["#FF540B","Startup"],["#38bdf8","Talent"],["#34d399","Investisseur"]].map(([color, label]) => (
             <div key={label} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: 10, height: 10, borderRadius: "50%", background: color, display: "inline-block" }} />
               <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)" }}>{label}</span>
@@ -145,15 +145,15 @@ function MatchingGraph() {
 // ─── Feature Card ──────────────────────────────────────────────────────────────
 // Éclair avec cercle autour — comme dans le capture
 const IconEclair = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
-    <path d="M13 7l-4 5h5l-1 5 4-5h-5l1-5z" fill="#f97316" stroke="none" opacity="0.9" />
+    <path d="M13 7l-4 5h5l-1 5 4-5h-5l1-5z" fill="#FF540B" stroke="none" opacity="0.9" />
   </svg>
 );
 
 // Deux personnes avec + entre elles — matching
 const IconPersonnes = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="7" cy="7" r="3" />
     <path d="M1 20v-1a6 6 0 0 1 6-6" />
     <circle cx="17" cy="7" r="3" />
@@ -165,16 +165,16 @@ const IconPersonnes = () => (
 
 // Cible triple cercle avec point central — matching
 const IconCible = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
     <circle cx="12" cy="12" r="6"  />
-    <circle cx="12" cy="12" r="2" fill="#f97316" stroke="none" />
+    <circle cx="12" cy="12" r="2" fill="#FF540B" stroke="none" />
   </svg>
 );
 
 // Flèche tendance haussière — matching
 const IconGraphe = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 17 8 12 12 15 17 9 21 13" />
     <polyline points="16 6 21 6 21 11" />
     <line x1="21" y1="6" x2="17" y2="9" />
@@ -213,7 +213,7 @@ function FeatureCard({ icon, title, desc, index }) {
 export default function HeroPage() {
   return (
     <div style={{
-      background: "linear-gradient(160deg, #0f1624 0%, #111827 40%, #0c1320 100%)",
+      background: "linear-gradient(160deg, #20222C , #20222C 40%, #0c1320 100%)",
       fontFamily: "'Sora', sans-serif",
       color: "#fff",
       overflowX: "hidden",
@@ -287,14 +287,14 @@ export default function HeroPage() {
         <main style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 24px 40px", position: "relative", zIndex: 2 }}>
 
           <div className="fade-up-1" style={{ display: "inline-flex", alignItems: "center", gap: "8px", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "999px", padding: "6px 16px", marginBottom: "40px", fontSize: "0.85rem", color: "rgba(255,255,255,0.75)", background: "rgba(255,255,255,0.04)" }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#f97316", flexShrink: 0, boxShadow: "0 0 8px #f97316", display: "inline-block" }} />
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#FF540B", flexShrink: 0, boxShadow: "0 0 8px #FF540B", display: "inline-block" }} />
             La plateforme de matching #1 en France
           </div>
 
           <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: "8px", color: "#fff" }}>
             Connectez-vous
           </h1>
-          <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", color: "#f97316", marginBottom: "32px" }}>
+          <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", color: "#FF540B", marginBottom: "32px" }}>
             à votre succès
           </h1>
 
@@ -303,10 +303,10 @@ export default function HeroPage() {
           </p>
 
           <div className="fade-up-4" style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center", marginBottom: "80px" }}>
-            <button className="btn-primary" style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 700, fontFamily: "inherit", display: "flex", alignItems: "center", gap: "8px" }}>
+            <button className="btn-primary" style={{ background: "#FF540B", color: "#fff", border: "none", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 700, fontFamily: "inherit", display: "flex", alignItems: "center", gap: "8px" }}>
               Trouver mon match <span>→</span>
             </button>
-            <button className="btn-outline" style={{ background: "transparent", color: "#f97316", border: "2px solid #f97316", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 600, fontFamily: "inherit" }}>
+            <button className="btn-outline" style={{ background: "transparent", color: "#FF540B", border: "2px solid #FF540B", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 600, fontFamily: "inherit" }}>
               Découvrir la plateforme
             </button>
           </div>
@@ -330,9 +330,9 @@ export default function HeroPage() {
 
         <div className="fade-up-6" style={{ textAlign: "center", marginBottom: "60px", position: "relative", zIndex: 2 }}>
           <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
-            Matching en <span style={{ color: "#f97316" }}>temps réel</span>
+            Matching en <span style={{ color: "#FF540B" }}>temps réel</span>
           </h2>
-          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(255,255,255,0.5)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(127,131,147,1)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
             Visualisez les connexions qui se créent entre startups, talents et investisseurs.
           </p>
         </div>
@@ -348,9 +348,9 @@ export default function HeroPage() {
 
         <div className="fade-up-8" style={{ textAlign: "center", marginBottom: "64px", position: "relative", zIndex: 2 }}>
           <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
-            Pourquoi <span style={{ color: "#f97316" }}>MatchHub</span> ?
+            Pourquoi <span style={{ color: "#FF540B" }}>MatchHub</span> ?
           </h2>
-          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(255,255,255,0.5)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(127,131,147,1)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
             Une technologie de pointe au service de connexions significatives.
           </p>
         </div>
