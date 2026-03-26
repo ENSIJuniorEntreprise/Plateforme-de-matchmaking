@@ -555,34 +555,34 @@ const Matchmaking = ({ onNavigate }) => {
   }
 
   return (
-    <section className="page matchmaking matchmaking-shell min-h-screen bg-[#20222C] px-5 py-10 text-white sm:px-8 lg:px-16">
+    <section className="page matchmaking matchmaking-shell min-h-screen bg-[#20222C] px-4 py-8 text-white sm:px-8 sm:py-10 lg:px-16">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center">
         <header className="matchmaking-header max-w-4xl text-center">
-          <h1 className="text-[2.9rem] font-bold tracking-[-0.03em] text-white sm:text-[4rem] lg:text-[4.25rem]">
+          <h1 className="text-[2.25rem] font-bold leading-tight tracking-[-0.03em] text-white sm:text-[4rem] lg:text-[4.25rem]">
             Trouvez votre{' '}
             <span className="bg-linear-to-r from-[#FF7033] to-[#FF9A1D] bg-clip-text text-transparent">
               match parfait
             </span>
           </h1>
-          <p className="mx-auto mt-5 max-w-3xl text-lg font-semibold leading-snug text-[#8F929F] sm:text-[1.65rem]">
+          <p className="mx-auto mt-4 max-w-3xl text-base font-semibold leading-snug text-[#8F929F] sm:mt-5 sm:text-[1.65rem]">
             Définissez vos critères et laissez notre algorithme intelligent trouver les meilleures
             correspondances.
           </p>
         </header>
 
-        <div className="mt-10 flex w-full max-w-5xl items-center justify-between gap-4 overflow-x-auto px-2 pb-2">
+        <div className="mt-8 flex w-full max-w-5xl items-center justify-between gap-3 overflow-x-auto px-1 pb-3 sm:mt-10 sm:gap-4 sm:px-2 sm:pb-2">
           {steps.map((step, index) => (
             <div
               key={step.id}
-              className="matchmaking-step-item flex min-w-fit flex-1 items-center gap-3"
+              className="matchmaking-step-item flex min-w-fit flex-1 items-center gap-2 sm:gap-3"
               style={{ animationDelay: `${0.08 * index}s` }}
             >
-              <div className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ${stepCircleClass[step.status]}`}>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold sm:h-9 sm:w-9 sm:text-sm ${stepCircleClass[step.status]}`}>
                 {step.id}
               </div>
-              <span className={`text-sm font-semibold ${stepTextClass[step.status]}`}>{step.label}</span>
+              <span className={`whitespace-nowrap text-xs font-semibold sm:text-sm ${stepTextClass[step.status]}`}>{step.label}</span>
               <div
-                className={`h-[2px] min-w-16 flex-1 ${
+                className={`h-[2px] min-w-10 flex-1 sm:min-w-16 ${
                   visualStep === 3 || step.id < visualStep ? 'bg-[#FF7033]' : stepLineClass[step.status]
                 }`}
               />
@@ -592,11 +592,11 @@ const Matchmaking = ({ onNavigate }) => {
 
         {currentStep === 1 ? (
           <>
-            <h2 className="mt-14 text-center text-2xl font-semibold sm:text-[2rem]">
+            <h2 className="mt-12 text-center text-[1.65rem] font-semibold sm:mt-14 sm:text-[2rem]">
               Quel type de profil recherchez-vous?
             </h2>
 
-            <div className="mt-12 grid w-full gap-6 sm:grid-cols-2 xl:grid-cols-4 xl:gap-8">
+            <div className="mt-10 grid w-full gap-5 sm:mt-12 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4 xl:gap-8">
               {profileOptions.map((option, index) => (
                 <button
                   key={option.id}
@@ -605,15 +605,15 @@ const Matchmaking = ({ onNavigate }) => {
                     setSelectedProfile(option.id)
                     setCurrentStep(2)
                   }}
-                  className="matchmaking-card matchmaking-profile-card matchmaking-button group h-[250px] w-full rounded-[2rem] border border-transparent bg-[#2F3241] px-7 py-10 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-500 hover:-translate-y-1 hover:border-[#FF7033] hover:bg-[rgba(255,112,51,0.10)]"
+                  className="matchmaking-card matchmaking-profile-card matchmaking-button group min-h-[220px] w-full rounded-[2rem] border border-transparent bg-[#2F3241] px-5 py-8 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-500 hover:-translate-y-1 hover:border-[#FF7033] hover:bg-[rgba(255,112,51,0.10)] sm:h-[250px] sm:px-7 sm:py-10"
                   style={{ animationDelay: `${0.12 * index}s` }}
                 >
                   <div className="flex h-full w-full flex-col items-center justify-center">
-                    <div className={`mx-auto flex h-14 w-14 items-center justify-center ${option.accent}`}>
+                    <div className={`mx-auto flex h-12 w-12 items-center justify-center sm:h-14 sm:w-14 ${option.accent}`}>
                       {option.icon}
                     </div>
-                    <h3 className="mt-5 text-[2rem] font-semibold leading-none text-white">{option.title}</h3>
-                    <p className="mt-4 text-sm leading-6 text-[#8F929F]">{option.description}</p>
+                    <h3 className="mt-4 text-[1.65rem] font-semibold leading-none text-white sm:mt-5 sm:text-[2rem]">{option.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-[#8F929F] sm:mt-4">{option.description}</p>
                   </div>
                 </button>
               ))}
@@ -621,13 +621,13 @@ const Matchmaking = ({ onNavigate }) => {
           </>
         ) : currentStep === 2 && !isAnalyzing ? (
           <>
-            <h2 className="mt-12 text-center text-[2rem] font-semibold text-white">Affinez votre recherche</h2>
+            <h2 className="mt-10 text-center text-[1.7rem] font-semibold text-white sm:mt-12 sm:text-[2rem]">Affinez votre recherche</h2>
 
-            <div className="matchmaking-panel relative mt-8 w-full rounded-[2rem] bg-[#343848] px-5 pb-5 pt-10 shadow-[0_28px_60px_rgba(0,0,0,0.18)] sm:px-8 sm:pb-7 sm:pt-12">
+            <div className="matchmaking-panel relative mt-8 w-full rounded-[2rem] bg-[#343848] px-4 pb-5 pt-5 shadow-[0_28px_60px_rgba(0,0,0,0.18)] sm:px-8 sm:pb-7 sm:pt-12">
               <button
                 type="button"
                 onClick={clearFilters}
-                className="matchmaking-button matchmaking-button-muted absolute right-4 top-[-12px] flex items-center gap-2 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0]"
+                className="matchmaking-button matchmaking-button-muted mb-5 ml-auto flex items-center gap-2 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0] sm:absolute sm:right-4 sm:top-[-12px] sm:mb-0"
               >
                 Effacer tout
                 <ChevronDownIcon className="h-4 w-4 -rotate-90" />
@@ -825,7 +825,7 @@ const Matchmaking = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="matchmaking-button matchmaking-button-muted inline-flex items-center justify-center gap-2 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0]"
+                  className="matchmaking-button matchmaking-button-muted inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0] sm:w-auto"
                 >
                   <ArrowLeftIcon className="h-4 w-4" />
                   Retour
@@ -834,7 +834,7 @@ const Matchmaking = ({ onNavigate }) => {
                 <button
                   type="button"
                     onClick={startAnalysis}
-                  className="matchmaking-button matchmaking-button-primary inline-flex items-center justify-center gap-2 rounded-full bg-[#FF7033] px-6 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.3)] transition hover:translate-y-[-1px] hover:bg-[#FF7B45]"
+                  className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#FF7033] px-6 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.3)] transition hover:translate-y-[-1px] hover:bg-[#FF7B45] sm:w-auto"
                 >
                   <SearchIcon className="h-5 w-5" />
                   Lancer la recherche
@@ -862,13 +862,13 @@ const Matchmaking = ({ onNavigate }) => {
           </div>
         ) : (
           <>
-            <div className="mt-10 flex w-full items-center justify-between gap-4">
+            <div className="mt-10 flex w-full flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-2xl font-semibold text-white sm:text-[2rem]">4 Matchs trouvés</h2>
-              <div ref={sortMenuRef} className="relative flex items-center gap-3">
+              <div ref={sortMenuRef} className="relative flex w-full items-center gap-3 sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setIsSortMenuOpen((open) => !open)}
-                  className="matchmaking-button matchmaking-button-muted inline-flex items-center gap-3 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0]"
+                  className="matchmaking-button matchmaking-button-muted inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0] sm:w-auto"
                 >
                   <FilterIcon className="h-4 w-4" />
                   Trier
@@ -876,7 +876,7 @@ const Matchmaking = ({ onNavigate }) => {
                 </button>
 
                 {isSortMenuOpen ? (
-                  <div className="matchmaking-dropdown-panel absolute right-0 top-[calc(100%+10px)] z-20 min-w-[210px] rounded-[1.2rem] border border-[rgba(143,146,159,0.35)] bg-[#2F3241] p-2 shadow-[0_20px_40px_rgba(0,0,0,0.28)]">
+                  <div className="matchmaking-dropdown-panel absolute left-0 right-0 top-[calc(100%+10px)] z-20 rounded-[1.2rem] border border-[rgba(143,146,159,0.35)] bg-[#2F3241] p-2 shadow-[0_20px_40px_rgba(0,0,0,0.28)] sm:left-auto sm:right-0 sm:min-w-[210px]">
                     {sortOptions.map((option) => (
                       <button
                         key={option}
@@ -931,7 +931,7 @@ const Matchmaking = ({ onNavigate }) => {
                     </div>
 
                     <div className="min-w-0">
-                      <h3 className="text-[1.15rem] font-semibold leading-tight text-[#16181F] sm:text-[2rem]">
+                      <h3 className="text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[2rem]">
                         {match.name}
                       </h3>
                       <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-[#8B8F9A]">
@@ -972,7 +972,7 @@ const Matchmaking = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
-                className="matchmaking-button matchmaking-button-muted inline-flex items-center justify-center gap-2 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0]"
+                className="matchmaking-button matchmaking-button-muted inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0] sm:w-auto"
               >
                 <ArrowLeftIcon className="h-4 w-4" />
                 Retour

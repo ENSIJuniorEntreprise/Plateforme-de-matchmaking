@@ -256,3 +256,21 @@ button {
     transform: translateY(-4px);
   }
 }
+
+@media (max-width: 640px) {
+  .matchmaking-loader-shell .svg-frame {
+    width: 240px;
+    height: 240px;
+  }
+
+  .matchmaking-loader-shell .svg-frame svg {
+    width: 280px;
+    height: 280px;
+  }
+
+  .matchmaking-result-card:hover,
+  .matchmaking-button:hover,
+  .matchmaking-chip:hover {
+    transform: none;
+  }
+}
