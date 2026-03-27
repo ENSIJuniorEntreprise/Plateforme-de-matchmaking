@@ -188,6 +188,25 @@ export default function HowItWorks() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+
+        /* Animation de scintillement doux */
+        @keyframes shine {
+          0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 84, 11, 0.5), 0 0 20px rgba(255, 84, 11, 0.3); }
+          50% { opacity: 0.9; text-shadow: 0 0 15px rgba(255, 84, 11, 0.8), 0 0 30px rgba(255, 84, 11, 0.5); }
+        }
+
+        @keyframes moveGradient {
+          to { background-position: 200% center; }
+        }
+
+        .text-shiny {
+          background: linear-gradient(135deg, #FF540B 0%, #ff8c5a 50%, #FF540B 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-size: 200% auto;
+          animation: shine 3s ease-in-out infinite, moveGradient 5s linear infinite;
+          display: inline-block;
+        }
       `}</style>
 
       <section
@@ -215,8 +234,7 @@ export default function HowItWorks() {
               letterSpacing: "-0.5px",
             }}
           >
-            Comment ça{" "}
-            <span style={{ color: "#FF540B" }}>fonctionne</span> ?
+            Comment ça <span className="text-shiny">fonctionne</span> ?
           </h2>
           <p
             style={{
@@ -249,8 +267,7 @@ export default function HowItWorks() {
               top: 0,
               bottom: 0,
               width: 1,
-              background:
-                "linear-gradient(to bottom, transparent, rgba(255,255,255,0.12) 10%, rgba(255,255,255,0.12) 90%, transparent)",
+              background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.12) 10%, rgba(255,255,255,0.12) 90%, transparent)",
               zIndex: 0,
             }}
           />

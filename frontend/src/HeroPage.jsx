@@ -64,8 +64,10 @@ function StarCanvas() {
 function Stat({ value, label }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-      <span style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, color: "#FF540B", letterSpacing: "-0.02em" }}>{value}</span>
-      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem" }}>{label}</span>
+      <span className="text-shiny" style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, letterSpacing: "-0.02em" }}>
+        {value}
+      </span>
+      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem" , whiteSpace: "nowrap"}}>{label}</span>
     </div>
   );
 }
@@ -276,6 +278,25 @@ export default function HeroPage() {
         }
         @media (max-width: 1000px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 500px)  { .cards-grid { grid-template-columns: 1fr; } }
+        /* Animation de scintillement doux */
+@keyframes shine {
+  0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 84, 11, 0.5), 0 0 20px rgba(255, 84, 11, 0.3); }
+  50% { opacity: 0.9; text-shadow: 0 0 15px rgba(255, 84, 11, 0.8), 0 0 30px rgba(255, 84, 11, 0.5); }
+}
+
+.text-shiny {
+  color: #FF540B;
+  /* Optionnel : un léger dégradé pour simuler un reflet métallique */
+  background: linear-gradient(135deg, #FF540B 0%, #ff8c5a 50%, #FF540B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shine 3s ease-in-out infinite, moveGradient 5s linear infinite;
+}
+
+@keyframes moveGradient {
+  to { background-position: 200% center; }
+}
       `}</style>
 
       {/* ★ Étoiles sur TOUT le fond (position: fixed) */}
@@ -294,9 +315,15 @@ export default function HeroPage() {
           <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: "8px", color: "#fff" }}>
             Connectez-vous
           </h1>
-          <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", color: "#FF540B", marginBottom: "32px" }}>
-            à votre succès
-          </h1>
+          <h1 className="fade-up-2 text-shiny" style={{ 
+  fontSize: "clamp(2.8rem, 7vw, 5.5rem)", 
+  fontWeight: 800, 
+  lineHeight: 1.05, 
+  letterSpacing: "-0.03em", 
+  marginBottom: "32px" 
+}}>
+  à votre succès
+</h1>
 
           <p className="fade-up-3" style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", color: "rgba(255,255,255,0.55)", maxWidth: "560px", lineHeight: 1.7, marginBottom: "48px" }}>
             Startups, talents &amp; investisseurs réunis par un moteur de matching intelligent. Trouvez vos partenaires idéaux en quelques clics.
@@ -311,7 +338,7 @@ export default function HeroPage() {
             </button>
           </div>
 
-          <div className="fade-up-5" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "clamp(24px, 6vw, 80px)", width: "100%", maxWidth: "780px" }}>
+          <div className="fade-up-5" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "clamp(24px, 6vw, 80px)", width: "100%", maxWidth: "px" }}>
             <Stat value="2,500+" label="Projets connectés" />
             <Stat value="850+"   label="Investisseurs actifs" />
             <Stat value="95%"    label="Taux de satisfaction" />
@@ -329,9 +356,9 @@ export default function HeroPage() {
         <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: "600px", height: "300px", background: "radial-gradient(ellipse, rgba(56,189,248,0.08) 0%, transparent 70%)", pointerEvents: "none", zIndex: 1 }} />
 
         <div className="fade-up-6" style={{ textAlign: "center", marginBottom: "60px", position: "relative", zIndex: 2 }}>
-          <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
-            Matching en <span style={{ color: "#FF540B" }}>temps réel</span>
-          </h2>
+        <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
+          Matching en <span className="text-shiny">temps réel</span>
+         </h2>
           <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(127,131,147,1)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
             Visualisez les connexions qui se créent entre startups, talents et investisseurs.
           </p>
@@ -343,24 +370,57 @@ export default function HeroPage() {
       </section>
 
       {/* ══════════ SECTION 3 — POURQUOI MATCHHUB ══════════ */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "120px 48px", position: "relative" }}>
-        <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: "radial-gradient(ellipse, #20222C,80%)", pointerEvents: "none", zIndex: 1 }} />
 
-        <div className="fade-up-8" style={{ textAlign: "center", marginBottom: "64px", position: "relative", zIndex: 2 }}>
-          <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
-            Pourquoi <span style={{ color: "#FF540B" }}>MatchHub</span> ?
-          </h2>
-          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(127,131,147,1)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
-            Une technologie de pointe au service de connexions significatives.
-          </p>
-        </div>
 
-        <div className="fade-up-9 cards-grid" style={{ position: "relative", zIndex: 2 }}>
-          {FEATURES.map((f, i) => (
-            <FeatureCard key={f.title} {...f} index={i} />
-          ))}
-        </div>
-      </section>
+{/* ══════════ SECTION 3 — POURQUOI MATCHHUB ══════════ */}
+<section style={{ 
+  minHeight: "100vh", 
+  display: "flex", 
+  flexDirection: "column", 
+  alignItems: "center", 
+  justifyContent: "center", 
+  padding: "120px 48px", 
+  position: "relative" 
+}}>
+  <div style={{ 
+    position: "absolute", 
+    top: "40%", 
+    left: "50%", 
+    transform: "translate(-50%,-50%)", 
+    width: "800px", 
+    height: "400px", 
+    background: "radial-gradient(ellipse, #20222C, 80%)", 
+    pointerEvents: "none", 
+    zIndex: 1 
+  }} />
+
+  <div className="fade-up-8" style={{ textAlign: "center", marginBottom: "64px", position: "relative", zIndex: 2 }}>
+    <h2 style={{ 
+      fontSize: "clamp(2rem, 5vw, 3.5rem)", 
+      fontWeight: 800, 
+      letterSpacing: "-0.03em", 
+      marginBottom: "16px", 
+      color: "#fff" 
+    }}>
+      Pourquoi <span className="text-shiny">MatchHub</span> ?
+    </h2>
+    <p style={{ 
+      fontSize: "clamp(0.95rem, 2vw, 1.1rem)", 
+      color: "rgba(127,131,147,1)", 
+      maxWidth: "520px", 
+      margin: "0 auto", 
+      lineHeight: 1.7 
+    }}>
+      Une technologie de pointe au service de connexions significatives.
+    </p>
+  </div>
+
+  <div className="fade-up-9 cards-grid" style={{ position: "relative", zIndex: 2 }}>
+    {FEATURES.map((f, i) => (
+      <FeatureCard key={f.title} {...f} index={i} />
+    ))}
+  </div>
+</section>
 
     </div>
   );
