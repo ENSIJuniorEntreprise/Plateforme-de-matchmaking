@@ -940,70 +940,74 @@ const Matchmaking = ({ onNavigate }) => {
 
             <div className="mt-7 grid w-full gap-8 md:grid-cols-2 xl:grid-cols-3">
               {sortedMatches.map((match, index) => (
-                <article
+                <div
                   key={match.id}
-                  className="matchmaking-result-card group rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24] transition duration-700 hover:-translate-y-2"
+                  className="matchmaking-result-card relative min-h-[250px] sm:min-h-[285px]"
                   style={{ animationDelay: `${index * 0.45}s` }}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="relative h-16 w-16 shrink-0">
-                      {match.avatarImage ? (
-                        <img
-                          src={match.avatarImage}
-                          alt={match.name}
-                          className="h-16 w-16 rounded-[1.2rem] object-cover object-center"
-                        />
-                      ) : (
-                        <div className={`flex h-16 w-16 items-center justify-center rounded-[1.2rem] text-lg font-bold text-white ${match.avatarClass}`}>
-                          {match.avatarLabel}
+                  <article className="matchmaking-result-card-surface group absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24]">
+                    <div className="flex items-start gap-4">
+                      <div className="relative h-16 w-16 shrink-0">
+                        {match.avatarImage ? (
+                          <img
+                            src={match.avatarImage}
+                            alt={match.name}
+                            className="h-16 w-16 rounded-[1.2rem] object-cover object-center"
+                          />
+                        ) : (
+                          <div className={`flex h-16 w-16 items-center justify-center rounded-[1.2rem] text-lg font-bold text-white ${match.avatarClass}`}>
+                            {match.avatarLabel}
+                          </div>
+                        )}
+                        <div className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full text-white ${match.badgeColor}`}>
+                          <FontAwesomeIcon
+                            icon={match.badgeIcon}
+                            style={{
+                              color: '#ffffff',
+                              transform: `scale(${match.badgeIcon?.iconName === 'rocket' ? 0.88 : 0.62})`,
+                            }}
+                          />
                         </div>
-                      )}
-                      <div className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full text-white ${match.badgeColor}`}>
-                        <FontAwesomeIcon
-                          icon={match.badgeIcon}
-                          style={{
-                            color: '#ffffff',
-                            transform: `scale(${match.badgeIcon?.iconName === 'rocket' ? 0.88 : 0.62})`,
-                          }}
-                        />
+                      </div>
+
+                      <div className="min-w-0">
+                        <h3 className="text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[2rem]">
+                          {match.name}
+                        </h3>
+                        <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-[#8B8F9A]">
+                          <SvgIcon path={icons.location} className="h-3.5 w-3.5 text-[#8B8F9A]" />
+                          {match.location}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="min-w-0">
-                      <h3 className="text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[2rem]">
-                        {match.name}
-                      </h3>
-                      <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-[#8B8F9A]">
-                        <SvgIcon path={icons.location} className="h-3.5 w-3.5 text-[#8B8F9A]" />
-                        {match.location}
-                      </p>
+                    <p className="mt-5 text-sm font-semibold leading-6 text-[#8B8F9A]">{match.description}</p>
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      {match.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="matchmaking-chip rounded-full bg-[#2F3241] px-4 py-1.5 text-xs font-semibold text-white"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
-                  </div>
 
-                  <p className="mt-5 text-sm font-semibold leading-6 text-[#8B8F9A]">{match.description}</p>
-
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    {match.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="matchmaking-chip rounded-full bg-[#2F3241] px-4 py-1.5 text-xs font-semibold text-white"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 overflow-hidden transition-all duration-500 max-sm:max-h-14 sm:max-h-0 sm:opacity-0 sm:group-hover:max-h-20 sm:group-hover:opacity-100">
-                    <button
-                      type="button"
-                      onClick={() => onNavigate?.('profile')}
-                      className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#FF7033] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.24)] transition hover:bg-[#FF7B45]"
-                    >
-                      <StarOutlineIcon className="h-4 w-4" />
-                      Voir le profil
-                    </button>
-                  </div>
-                </article>
+                    <div className="mt-5 overflow-hidden sm:max-h-0 sm:transition-all sm:duration-500 sm:group-hover:max-h-[68px]">
+                      <div className="w-full transition-all duration-500 max-sm:translate-y-0 max-sm:opacity-100 sm:pointer-events-none sm:translate-y-3 sm:opacity-0 sm:group-hover:pointer-events-auto sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => onNavigate?.('profile')}
+                          className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#FF7033] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.24)] transition hover:bg-[#FF7B45]"
+                        >
+                          <StarOutlineIcon className="h-4 w-4" />
+                          Voir le profil
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </div>
               ))}
             </div>
 

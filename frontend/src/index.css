@@ -180,11 +180,17 @@ button {
 }
 
 .matchmaking-result-card {
+  position: relative;
   animation: matchmaking-card-float 10.5s ease-in-out infinite;
   will-change: transform;
+}
+
+.matchmaking-result-card-surface {
   transition:
     transform 0.7s ease,
     box-shadow 0.7s ease;
+  transform: scale(0.98);
+  transform-origin: top center;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.72),
     0 18px 42px rgba(255, 255, 255, 0.18),
@@ -193,6 +199,11 @@ button {
 
 .matchmaking-result-card:hover {
   animation-play-state: paused;
+  z-index: 10;
+}
+
+.matchmaking-result-card:hover .matchmaking-result-card-surface {
+  transform: scale(1.04);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.82),
     0 24px 54px rgba(255, 255, 255, 0.22),
@@ -272,5 +283,9 @@ button {
   .matchmaking-button:hover,
   .matchmaking-chip:hover {
     transform: none;
+  }
+
+  .matchmaking-result-card-surface {
+    transform: scale(1);
   }
 }
