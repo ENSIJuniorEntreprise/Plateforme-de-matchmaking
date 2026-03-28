@@ -35,40 +35,40 @@ button {
 }
 
 .matchmaking-shell {
-  animation: matchmaking-page-in 0.7s ease-out;
+  animation: matchmaking-page-in 1s ease-out;
 }
 
 .matchmaking-header {
-  animation: matchmaking-fade-up 0.7s ease-out both;
+  animation: matchmaking-fade-up 0.95s ease-out both;
 }
 
 .matchmaking-step-item {
-  animation: matchmaking-fade-up 0.55s ease-out both;
+  animation: matchmaking-fade-up 0.8s ease-out both;
 }
 
 .matchmaking-panel {
-  animation: matchmaking-fade-up 0.65s ease-out both;
+  animation: matchmaking-fade-up 0.9s ease-out both;
 }
 
 .matchmaking-card {
-  animation: matchmaking-fade-up 0.6s ease-out both;
+  animation: matchmaking-fade-up 1.2s ease-out both;
 }
 
 .matchmaking-profile-card {
-  transition-duration: 0.48s;
+  transition-duration: 1s;
 }
 
 .matchmaking-dropdown-panel {
-  animation: matchmaking-menu-in 0.22s ease-out both;
+  animation: matchmaking-menu-in 0.38s ease-out both;
   transform-origin: top;
 }
 
 .matchmaking-chip {
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
+    transform 0.34s ease,
+    box-shadow 0.34s ease,
+    background-color 0.34s ease,
+    color 0.34s ease;
 }
 
 .matchmaking-chip:hover {
@@ -77,11 +77,11 @@ button {
 
 .matchmaking-button {
   transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    background-color 0.22s ease,
-    border-color 0.22s ease,
-    opacity 0.22s ease;
+    transform 0.36s ease,
+    box-shadow 0.36s ease,
+    background-color 0.36s ease,
+    border-color 0.36s ease,
+    opacity 0.36s ease;
 }
 
 .matchmaking-button:hover {
@@ -101,14 +101,14 @@ button {
 }
 
 .matchmaking-soft-bob {
-  animation: matchmaking-soft-bob 5.4s ease-in-out infinite;
+  animation: matchmaking-soft-bob 7.5s ease-in-out infinite;
 }
 
 .matchmaking-loader-shell {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: matchmaking-fade-up 0.5s ease-out both;
+  animation: matchmaking-fade-up 0.8s ease-out both;
 }
 
 .matchmaking-loader-shell .svg-frame {
@@ -123,7 +123,7 @@ button {
 
 .matchmaking-loader-shell .svg-frame svg {
   position: absolute;
-  transition: transform 0.5s ease;
+  transition: transform 0.8s ease;
   z-index: calc(1 - (0.2 * var(--j)));
   transform-origin: center;
   width: 344px;
@@ -133,29 +133,29 @@ button {
 }
 
 .matchmaking-loader-shell .svg-frame #out2 {
-  animation: matchmaking-loader-rotate 7s ease-in-out infinite alternate;
+  animation: matchmaking-loader-rotate 9.5s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
 .matchmaking-loader-shell .svg-frame #out3 {
-  animation: matchmaking-loader-rotate 3.2s ease-in-out infinite alternate;
+  animation: matchmaking-loader-rotate 4.8s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
 .matchmaking-loader-shell .svg-frame #inner3,
 .matchmaking-loader-shell .svg-frame #inner1 {
-  animation: matchmaking-loader-rotate 4.4s ease-in-out infinite alternate;
+  animation: matchmaking-loader-rotate 6.2s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
 .matchmaking-loader-shell .svg-frame #center1 {
-  animation: matchmaking-loader-rotate 2.2s ease-in-out infinite alternate;
+  animation: matchmaking-loader-rotate 3.2s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
 .matchmaking-loader-shell .svg-frame #center {
   transform-origin: center;
-  animation: matchmaking-loader-pulse 1.8s ease-in-out infinite;
+  animation: matchmaking-loader-pulse 2.6s ease-in-out infinite;
 }
 
 @keyframes matchmaking-loader-rotate {
@@ -180,11 +180,11 @@ button {
 }
 
 .matchmaking-result-card {
-  animation: matchmaking-card-float 7.6s ease-in-out infinite;
+  animation: matchmaking-card-float 10.5s ease-in-out infinite;
   will-change: transform;
   transition:
-    transform 0.45s ease,
-    box-shadow 0.45s ease;
+    transform 0.7s ease,
+    box-shadow 0.7s ease;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.72),
     0 18px 42px rgba(255, 255, 255, 0.18),

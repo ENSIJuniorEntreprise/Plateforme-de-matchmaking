@@ -445,9 +445,25 @@ const Matchmaking = ({ onNavigate }) => {
   }
 
   const toggleLocation = (location) => {
-    setSelectedLocations((current) =>
-      current.includes(location) ? current.filter((item) => item !== location) : [...current, location]
-    )
+    setSelectedLocations((current) => {
+      const exclusiveLocations = ['WorldWide', 'Remote']
+
+      if (exclusiveLocations.includes(location)) {
+        const nextLocations = current.includes(location) ? [] : [location]
+
+        if (nextLocations.length > 0) {
+          setIsLocationMenuOpen(false)
+        }
+
+        return nextLocations
+      }
+
+      const withoutExclusiveLocations = current.filter((item) => !exclusiveLocations.includes(item))
+
+      return withoutExclusiveLocations.includes(location)
+        ? withoutExclusiveLocations.filter((item) => item !== location)
+        : [...withoutExclusiveLocations, location]
+    })
   }
 
   useEffect(() => {
@@ -503,8 +519,18 @@ const Matchmaking = ({ onNavigate }) => {
   }, [isAnalyzing])
 
   const visualStep = isAnalyzing ? 3 : currentStep
+  const missingCriteria = [
+    selectedSectors.length === 0 ? 'secteur' : null,
+    !activeStage ? 'stade de développement' : null,
+    selectedLocations.length === 0 ? 'localisation' : null,
+  ].filter(Boolean)
+  const isCriteriaComplete = missingCriteria.length === 0
 
   const startAnalysis = () => {
+    if (!isCriteriaComplete) {
+      return
+    }
+
     setIsSectorMenuOpen(false)
     setIsLocationMenuOpen(false)
     setIsAnalyzing(true)
@@ -605,7 +631,7 @@ const Matchmaking = ({ onNavigate }) => {
                     setSelectedProfile(option.id)
                     setCurrentStep(2)
                   }}
-                  className="matchmaking-card matchmaking-profile-card matchmaking-button group min-h-[220px] w-full rounded-[2rem] border border-transparent bg-[#2F3241] px-5 py-8 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-500 hover:-translate-y-1 hover:border-[#FF7033] hover:bg-[rgba(255,112,51,0.10)] sm:h-[250px] sm:px-7 sm:py-10"
+                  className="matchmaking-card matchmaking-profile-card matchmaking-button group min-h-[220px] w-full rounded-[2rem] border border-transparent bg-[#2F3241] px-5 py-8 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition duration-1000 hover:-translate-y-1 hover:border-[#FF7033] hover:bg-[rgba(255,112,51,0.10)] sm:h-[250px] sm:px-7 sm:py-10"
                   style={{ animationDelay: `${0.12 * index}s` }}
                 >
                   <div className="flex h-full w-full flex-col items-center justify-center">
@@ -732,7 +758,7 @@ const Matchmaking = ({ onNavigate }) => {
                   <div className="mt-7">
                     <div className="relative rounded-full bg-[#2F3241] p-1.5">
                       <div
-                        className="flex h-10 items-center justify-center rounded-full bg-[#A5A8B3] px-4 text-sm font-semibold text-white transition-all duration-300"
+                        className="flex h-10 items-center justify-center rounded-full bg-[#A5A8B3] px-4 text-sm font-semibold text-white transition-all duration-500"
                         style={{
                           width: budgetWidths[budgetIndex],
                           background:
@@ -799,16 +825,24 @@ const Matchmaking = ({ onNavigate }) => {
                       <div className="flex flex-wrap gap-2">
                         {locationOptions.map((location) => {
                           const isSelected = selectedLocations.includes(location)
+                          const hasExclusiveLocationSelected =
+                            selectedLocations.includes('WorldWide') || selectedLocations.includes('Remote')
+                          const isDisabled =
+                            hasExclusiveLocationSelected &&
+                            !selectedLocations.includes(location)
 
                           return (
                             <button
                               key={location}
                               type="button"
                               onClick={() => toggleLocation(location)}
+                              disabled={isDisabled}
                               className={`matchmaking-chip rounded-full px-4 py-2 text-sm font-semibold transition ${
                                 isSelected
                                   ? 'bg-[#FF7033] text-white'
-                                  : 'bg-[#3C4150] text-white hover:bg-[#494F60]'
+                                  : isDisabled
+                                    ? 'cursor-not-allowed bg-[#3C4150]/60 text-[#8F929F]'
+                                    : 'bg-[#3C4150] text-white hover:bg-[#494F60]'
                               }`}
                             >
                               {location}
@@ -833,8 +867,13 @@ const Matchmaking = ({ onNavigate }) => {
 
                 <button
                   type="button"
-                    onClick={startAnalysis}
-                  className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#FF7033] px-6 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.3)] transition hover:translate-y-[-1px] hover:bg-[#FF7B45] sm:w-auto"
+                  onClick={startAnalysis}
+                  disabled={!isCriteriaComplete}
+                  className={`matchmaking-button inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold text-white transition sm:w-auto ${
+                    isCriteriaComplete
+                      ? 'matchmaking-button-primary bg-[#FF7033] shadow-[0_12px_24px_rgba(255,112,51,0.3)] hover:translate-y-[-1px] hover:bg-[#FF7B45]'
+                      : 'cursor-not-allowed bg-[#6E7280] shadow-none opacity-70'
+                  }`}
                 >
                   <SearchIcon className="h-5 w-5" />
                   Lancer la recherche
@@ -855,7 +894,7 @@ const Matchmaking = ({ onNavigate }) => {
 
             <div className="mt-10 h-3 w-full max-w-md overflow-hidden rounded-full bg-[#35394A]">
               <div
-                className="h-full rounded-full bg-[#FF7033] transition-all duration-300"
+                className="h-full rounded-full bg-[#FF7033] transition-all duration-500"
                 style={{ width: `${analysisProgress}%` }}
               />
             </div>
@@ -903,7 +942,7 @@ const Matchmaking = ({ onNavigate }) => {
               {sortedMatches.map((match, index) => (
                 <article
                   key={match.id}
-                  className="matchmaking-result-card group rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24] transition duration-500 hover:-translate-y-2"
+                  className="matchmaking-result-card group rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24] transition duration-700 hover:-translate-y-2"
                   style={{ animationDelay: `${index * 0.45}s` }}
                 >
                   <div className="flex items-start gap-4">
@@ -954,7 +993,7 @@ const Matchmaking = ({ onNavigate }) => {
                     ))}
                   </div>
 
-                  <div className="mt-5 overflow-hidden transition-all duration-300 max-sm:max-h-14 sm:max-h-0 sm:opacity-0 sm:group-hover:max-h-20 sm:group-hover:opacity-100">
+                  <div className="mt-5 overflow-hidden transition-all duration-500 max-sm:max-h-14 sm:max-h-0 sm:opacity-0 sm:group-hover:max-h-20 sm:group-hover:opacity-100">
                     <button
                       type="button"
                       onClick={() => onNavigate?.('profile')}
