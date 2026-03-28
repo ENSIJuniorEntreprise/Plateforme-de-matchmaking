@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import { Users, Eye, MessageSquare, TrendingUp, Zap, ChevronRight, Bell } from "lucide-react";
 
 const initialNotifications = [
-  { id: 1, title: "Nouveau match !", detail: "TechFlow vient de matcher avec Mikel Arteta — consultez son profil pour démarrer une conversation.", icon: "🎯", color: "#FF540B", bg: "rgba(255,84,11,0.08)", border: "rgba(255,84,11,0.18)", read: false },
-  { id: 2, title: "Message reçu", detail: "Sophie Chen vous a envoyé un message : « Bonjour, votre projet m'intéresse beaucoup ! »", icon: "💬", color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.18)", read: false },
-  { id: 3, title: "Profil Vu", detail: "Microsoft a consulté votre profil il y a 2 heures. Profitez-en pour envoyer un message !", icon: "👁️", color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.18)", read: true },
+  { id: 1, title: "Nouveau match !", detail: "TechFlow vient de matcher avec Mikel Arteta — consultez son profil pour démarrer une conversation.", icon: "🎯", accentClass: "text-[#FF540B]", dotBgClass: "bg-[#FF540B]", dotShadowClass: "shadow-[0_0_7px_2px_#FF540B99]", hoverBgClass: "hover:bg-[rgba(255,84,11,0.08)]", hoverBorderClass: "hover:border-[rgba(255,84,11,0.18)]", read: false },
+  { id: 2, title: "Message reçu", detail: "Sophie Chen vous a envoyé un message : « Bonjour, votre projet m'intéresse beaucoup ! »", icon: "💬", accentClass: "text-[#3b82f6]", dotBgClass: "bg-[#3b82f6]", dotShadowClass: "shadow-[0_0_7px_2px_#3b82f699]", hoverBgClass: "hover:bg-[rgba(59,130,246,0.08)]", hoverBorderClass: "hover:border-[rgba(59,130,246,0.18)]", read: false },
+  { id: 3, title: "Profil Vu", detail: "Microsoft a consulté votre profil il y a 2 heures. Profitez-en pour envoyer un message !", icon: "👁️", accentClass: "text-[#10b981]", dotBgClass: "bg-[#10b981]", dotShadowClass: "shadow-[0_0_7px_2px_#10b98199]", hoverBgClass: "hover:bg-[rgba(16,185,129,0.08)]", hoverBorderClass: "hover:border-[rgba(16,185,129,0.18)]", read: true },
 ];
 
 const stats = [
-  { label: "matchs",      value: "24",   delta: "+12%", positive: true,  icon: Users,         color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
-  { label: "Vues profil", value: "1.2k", delta: "+8%",  positive: true,  icon: Eye,           color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
-  { label: "Messages",    value: "18",   delta: "-2%",  positive: false, icon: MessageSquare, color: "#10b981", bg: "rgba(16,185,129,0.12)" },
-  { label: "Score",       value: "92%",  delta: "+12%", positive: true,  icon: TrendingUp,    color: "#FF540B", bg: "rgba(255,84,11,0.12)"  },
+  { label: "matchs",      value: "24",   delta: "+12%", positive: true,  icon: Users,         iconClass: "text-[#f59e0b]", iconBgClass: "bg-[rgba(245,158,11,0.12)]", glowClass: "bg-[#f59e0b]" },
+  { label: "Vues profil", value: "1.2k", delta: "+8%",  positive: true,  icon: Eye,           iconClass: "text-[#3b82f6]", iconBgClass: "bg-[rgba(59,130,246,0.12)]", glowClass: "bg-[#3b82f6]" },
+  { label: "Messages",    value: "18",   delta: "-2%",  positive: false, icon: MessageSquare, iconClass: "text-[#10b981]", iconBgClass: "bg-[rgba(16,185,129,0.12)]", glowClass: "bg-[#10b981]" },
+  { label: "Score",       value: "92%",  delta: "+12%", positive: true,  icon: TrendingUp,    iconClass: "text-[#FF540B]", iconBgClass: "bg-[rgba(255,84,11,0.12)]", glowClass: "bg-[#FF540B]"  },
 ];
-
+ 
 const recentMatches = [
   { name: "Sophie Chen", role: "Talent",   roleIcon: "👤", match: 95, img: "https://randomuser.me/api/portraits/women/44.jpg" },
   { name: "Capital VC",  role: "Investor", roleIcon: "💲", match: 88, img: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=80&h=80&fit=crop" },
@@ -21,45 +21,26 @@ const recentMatches = [
 ];
 
 function NotifCard({ notif, onRead }) {
-  const [hovered, setHovered] = useState(false);
   const isUnread = !notif.read;
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onClick={() => onRead(notif.id)}
-      style={{
-        position: "relative",
-        background: hovered ? notif.bg : isUnread ? "rgba(255,255,255,0.055)" : "rgba(255,255,255,0.015)",
-        border: `1px solid ${hovered ? notif.border : isUnread ? "rgba(255,255,255,0.11)" : "rgba(255,255,255,0.05)"}`,
-        borderRadius: "14px",
-        padding: hovered ? "16px 18px 18px" : "14px 18px",
-        cursor: "pointer",
-        transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-        overflow: "hidden",
-        opacity: notif.read ? 0.45 : 1,
-        boxShadow: isUnread && !hovered ? "0 2px 14px rgba(255,255,255,0.04), inset 0 0 0 1px rgba(255,255,255,0.06)" : "none",
-      }}
+      className={`group relative cursor-pointer overflow-hidden rounded-[14px] border transition-all duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] ${notif.hoverBgClass} ${notif.hoverBorderClass} ${isUnread ? "border-[rgba(255,255,255,0.11)] bg-[rgba(255,255,255,0.055)] shadow-[0_2px_14px_rgba(255,255,255,0.04),inset_0_0_0_1px_rgba(255,255,255,0.06)]" : "border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] opacity-45"} px-[18px] py-[14px] hover:px-[18px] hover:pb-[18px] hover:pt-[16px]`}
     >
       {isUnread && (
-        <div style={{
-          position: "absolute", top: 15, right: 14,
-          width: 7, height: 7, borderRadius: "50%",
-          background: notif.color,
-          boxShadow: `0 0 7px 2px ${notif.color}99`,
-        }} />
+        <div className={`absolute right-[14px] top-[15px] h-[7px] w-[7px] rounded-full ${notif.dotBgClass} ${notif.dotShadowClass}`} />
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <span style={{ fontSize: "20px", filter: notif.read ? "grayscale(0.7)" : "none", transition: "filter 0.3s" }}>
+      <div className="flex items-center gap-[12px]">
+        <span className={`text-[20px] transition-[filter] duration-300 ${notif.read ? "grayscale-[0.7]" : "grayscale-0"}`}>
           {notif.icon}
         </span>
-        <span style={{ color: notif.read ? "#555c6b" : "#fff", fontWeight: notif.read ? 500 : 700, fontSize: "0.9rem", fontFamily: "'Sora', sans-serif", transition: "color 0.3s" }}>
+        <span className={`font-sora text-[0.9rem] transition-colors duration-300 ${notif.read ? "font-medium text-[#555c6b]" : "font-bold text-white"}`}>
           {notif.title}
         </span>
-        <ChevronRight size={14} color={notif.color} style={{ marginLeft: "auto", marginRight: isUnread ? "18px" : "0", transform: hovered ? "translateX(3px)" : "translateX(0)", transition: "transform 0.25s ease", opacity: hovered ? 1 : 0.4 }} />
+        <ChevronRight className={`ml-auto h-5 w-5 opacity-40 transition-all duration-200 ease-in group-hover:translate-x-[3px] group-hover:opacity-100 ${isUnread ? "mr-[18px]" : "mr-0"} ${notif.accentClass}`} />
       </div>
-      <div style={{ maxHeight: hovered ? "80px" : "0px", opacity: hovered ? 1 : 0, overflow: "hidden", transition: "max-height 0.35s ease, opacity 0.25s ease", marginTop: hovered ? "10px" : "0" }}>
-        <p style={{ color: "#9ca3af", fontSize: "0.78rem", lineHeight: 1.6, margin: 0, fontFamily: "'Sora', sans-serif" }}>
+      <div className="mt-0 max-h-0 overflow-hidden opacity-0 transition-[max-height,opacity,margin-top] duration-[350ms,250ms,250ms] ease-[ease,ease,ease] group-hover:mt-[10px] group-hover:max-h-[80px] group-hover:opacity-100">
+        <p className="font-sora m-0 text-[0.78rem] leading-[1.6] text-[#9ca3af]">
           {notif.detail}
         </p>
       </div>
@@ -67,63 +48,49 @@ function NotifCard({ notif, onRead }) {
   );
 }
 
-function StatCard({ stat, index }) {
+function StatCard({ stat, floatClass }) {
   const Icon = stat.icon;
   return (
-    <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", padding: "22px 24px", display: "flex", flexDirection: "column", gap: "12px", flex: 1, minWidth: 0, position: "relative", overflow: "hidden", animation: `float ${2.8 + index * 0.4}s ease-in-out infinite`, transition: "border-color 0.2s ease, box-shadow 0.2s ease" }}
-      onMouseEnter={e => { e.currentTarget.style.animationPlayState = "paused"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)"; e.currentTarget.style.boxShadow = "0 12px 35px rgba(0,0,0,0.35)"; }}
-      onMouseLeave={e => { e.currentTarget.style.animationPlayState = "running"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.boxShadow = "none"; }}
-    >
-      <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, background: stat.color, borderRadius: "50%", filter: "blur(35px)", opacity: 0.15, pointerEvents: "none" }} />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div style={{ background: stat.bg, borderRadius: "10px", width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon size={18} color={stat.color} strokeWidth={2.2} />
+    <div className={`group relative flex min-w-0 flex-1 flex-col gap-[12px] overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.04)] px-[24px] py-[22px] transition-[border-color,box-shadow] duration-200 hover:border-[rgba(255,255,255,0.18)] hover:shadow-[0_12px_35px_rgba(0,0,0,0.35)] ${floatClass} hover:[animation-play-state:paused]`}>
+      <div className={`pointer-events-none absolute right-[-20px] top-[-20px] h-[80px] w-[80px] rounded-full opacity-15 blur-[35px] ${stat.glowClass}`} />
+      <div className="flex items-start justify-between">
+        <div className={`flex h-[38px] w-[38px] items-center justify-center rounded-[10px] ${stat.iconBgClass}`}>
+          <Icon strokeWidth={2.2} className={`h-5 w-5 ${stat.iconClass}`} />
         </div>
-        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: stat.positive ? "#4ade80" : "#f87171", background: stat.positive ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)", padding: "3px 8px", borderRadius: "20px", fontFamily: "'Sora', sans-serif" }}>
+        <span className={`font-sora rounded-[20px] px-[8px] py-[3px] text-[0.75rem] font-bold ${stat.positive ? "bg-[rgba(74,222,128,0.1)] text-[#4ade80]" : "bg-[rgba(248,113,113,0.1)] text-[#f87171]"}`}>
           {stat.delta}
         </span>
       </div>
       <div>
-        <div style={{ fontSize: "1.9rem", fontWeight: 800, color: "#fff", lineHeight: 1, fontFamily: "'Sora', sans-serif" }}>{stat.value}</div>
-        <div style={{ fontSize: "0.78rem", color: "#6b7280", marginTop: 4, fontFamily: "'Sora', sans-serif" }}>{stat.label}</div>
+        <div className="font-sora text-[1.9rem] font-extrabold leading-none text-white">{stat.value}</div>
+        <div className="font-sora mt-[4px] text-[0.78rem] text-[#6b7280]">{stat.label}</div>
       </div>
     </div>
   );
 }
 
 function MatchRow({ match }) {
-  const [hovered, setHovered] = useState(false);
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "13px 16px", borderRadius: "14px", background: hovered ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", cursor: "pointer", transition: "all 0.2s ease" }}>
-      <img src={match.img} alt={match.name} style={{ width: 46, height: 46, borderRadius: "12px", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(255,255,255,0.1)" }} />
-      <div style={{ flex: 1 }}>
-        <div style={{ color: "#fff", fontWeight: 700, fontSize: "1rem", fontFamily: "'Sora', sans-serif" }}>{match.name}</div>
-        <div style={{ color: "#6b7280", fontSize: "0.9rem", marginTop: 2, fontWeight: 600, fontFamily: "'Sora', sans-serif" }}>{match.roleIcon} {match.role}</div>
+    <div className="flex cursor-pointer items-center gap-[14px] rounded-[14px] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] px-[16px] py-[13px] transition-all duration-200 ease-in hover:bg-[rgba(255,255,255,0.06)]">
+      <img src={match.img} alt={match.name} className="h-[46px] w-[46px] shrink-0 rounded-[12px] border border-[rgba(255,255,255,0.1)] object-cover" />
+      <div className="flex-1">
+        <div className="font-sora text-[1rem] font-bold text-white">{match.name}</div>
+        <div className="font-sora mt-[2px] text-[0.9rem] font-semibold text-[#6b7280]">{match.roleIcon} {match.role}</div>
       </div>
-      <div style={{ textAlign: "right", flexShrink: 0 }}>
-        <div style={{ color: "#FF540B", fontWeight: 800, fontSize: "1.05rem", fontFamily: "'Sora', sans-serif", lineHeight: 1 }}>{match.match}%</div>
-        <div style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: 3, fontWeight: 800, fontFamily: "'Sora', sans-serif" }}>Match</div>
+      <div className="shrink-0 text-right">
+        <div className="font-sora text-[1.05rem] font-extrabold leading-none text-[#FF540B]">{match.match}%</div>
+        <div className="font-sora mt-[3px] text-[0.75rem] font-extrabold text-[#6b7280]">Match</div>
       </div>
     </div>
   );
 }
 
 function VoirToutBtn() {
-  const [hovered, setHovered] = useState(false);
   return (
     <button
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: "none", border: "none",
-        color: hovered ? "#FF540B" : "#6b7280",
-        fontSize: "0.78rem", fontWeight: 600,
-        cursor: "pointer", fontFamily: "'Sora', sans-serif",
-        display: "flex", alignItems: "center", gap: 4,
-        transition: "color 0.2s ease",
-      }}
+      className="font-sora flex cursor-pointer items-center gap-[4px] border-none bg-transparent text-[0.78rem] font-semibold text-[#6b7280] transition-colors duration-200 ease-in hover:text-[#FF540B]"
     >
-      Voir tout <ChevronRight size={13} />
+      Voir tout <ChevronRight className="h-5 w-5" />
     </button>
   );
 }
@@ -135,83 +102,69 @@ export default function Dashboard({ onNavigate }) {
   const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
-        @keyframes float {
-          0%   { transform: translateY(0px); }
-          50%  { transform: translateY(-7px); }
-          100% { transform: translateY(0px); }
-        }
-        .dash-profile-btn { background: #FF540B; color: #fff; border: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; cursor: pointer; font-family: 'Sora', sans-serif; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; letter-spacing: 0.3px; }
-        .dash-profile-btn:hover { background: #e04800; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,84,11,0.35); }
-      `}</style>
+      <div className="font-sora min-h-screen bg-[#14161e] px-[clamp(16px,4vw,48px)] pb-[60px] pt-[40px]">
 
-      <div style={{ minHeight: "100vh", background: "#14161e", fontFamily: "'Sora', sans-serif", padding: "40px clamp(16px, 4vw, 48px) 60px" }}>
-
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <h1 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 800, color: "#fff", margin: 0 }}>
-            Bonjour, <span style={{ color: "#FF540B" }}>TechFlow 👋</span>
+        <div className="mb-[40px] text-center">
+          <h1 className="m-0 text-[clamp(1.6rem,3vw,2.2rem)] font-extrabold text-white">
+            Bonjour, <span className="text-[#FF540B]">TechFlow 👋</span>
           </h1>
-          <p style={{ color: "#6b7280", marginTop: 6, fontSize: "0.88rem" }}>Voici votre tableau de bord</p>
+          <p className="mt-[6px] text-[0.88rem] text-[#6b7280]">Voici votre tableau de bord</p>
         </div>
 
-        <div style={{ display: "flex", gap: "16px", marginBottom: "28px", flexWrap: "wrap" }}>
-          {stats.map((s, i) => <StatCard key={i} stat={s} index={i} />)}
+        <div className="mb-[28px] flex flex-wrap gap-[16px]">
+          {stats.map((s, i) => <StatCard key={i} stat={s} floatClass={i === 0 ? "animate-float-1" : i === 1 ? "animate-float-2" : i === 2 ? "animate-float-3" : "animate-float-4"} />)}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "20px", marginBottom: "24px", alignItems: "start" }}>
+        <div className="mb-[24px] grid grid-cols-[1fr_360px] items-start gap-[20px]">
 
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "20px", padding: "28px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <Users size={17} color="#FF540B" />
-                <h2 style={{ color: "#fff", fontWeight: 800, fontSize: "1.05rem", margin: 0 }}>Matchs récents</h2>
+          <div className="rounded-[20px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-[28px]">
+            <div className="mb-[20px] flex items-center justify-between">
+              <div className="flex items-center gap-[10px]">
+                <Users className="h-5 w-5 text-[#FF540B]" />
+                <h2 className="m-0 text-[1.05rem] font-extrabold text-white">Matchs récents</h2>
               </div>
               <VoirToutBtn />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="flex flex-col gap-[10px]">
               {recentMatches.map((m, i) => <MatchRow key={i} match={m} />)}
             </div>
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "20px", padding: "28px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{ position: "relative" }}>
-                  <Bell size={17} color="#FF540B" />
+          <div className="rounded-[20px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-[28px]">
+            <div className="mb-[20px] flex items-center justify-between">
+              <div className="flex items-center gap-[10px]">
+                <div className="relative">
+                  <Bell className="h-5 w-5 text-[#FF540B]" />
                   {unreadCount > 0 && (
-                    <div style={{ position: "absolute", top: -7, right: -8, minWidth: 16, height: 16, background: "#FF540B", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", fontWeight: 800, color: "#fff", fontFamily: "'Sora', sans-serif", border: "2px solid #14161e", padding: "0 3px", lineHeight: 1, boxShadow: "0 0 8px rgba(255,84,11,0.6)" }}>
+                    <div className="font-sora absolute right-[-8px] top-[-7px] flex h-[16px] min-w-[16px] items-center justify-center rounded-full border-[2px] border-[#14161e] bg-[#FF540B] px-[3px] text-[0.6rem] font-extrabold leading-none text-white shadow-[0_0_8px_rgba(255,84,11,0.6)]">
                       {unreadCount}
                     </div>
                   )}
                 </div>
-                <h2 style={{ color: "#fff", fontWeight: 800, fontSize: "1.05rem", margin: 0 }}>Notifications</h2>
+                <h2 className="m-0 text-[1.05rem] font-extrabold text-white">Notifications</h2>
               </div>
               {unreadCount > 0 && (
-                <button onClick={markAllRead} style={{ background: "none", border: "none", color: "#6b7280", fontSize: "0.72rem", cursor: "pointer", fontFamily: "'Sora', sans-serif", fontWeight: 600, transition: "color 0.2s ease" }}
-                  onMouseEnter={e => e.target.style.color = "#FF540B"} onMouseLeave={e => e.target.style.color = "#6b7280"}>
+                <button onClick={markAllRead} className="font-sora cursor-pointer border-none bg-transparent text-[0.72rem] font-semibold text-[#6b7280] transition-colors duration-200 ease-in hover:text-[#FF540B]">
                   Tout lire
                 </button>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="flex flex-col gap-[10px]">
               {notifications.map(n => <NotifCard key={n.id} notif={n} onRead={markAsRead} />)}
             </div>
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,84,11,0.15)", borderRadius: "20px", padding: "40px 28px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 300, height: 120, background: "#FF540B", filter: "blur(80px)", opacity: 0.07, pointerEvents: "none" }} />
-          <Zap size={32} color="#FF540B" strokeWidth={2.5} style={{ marginBottom: 14 }} />
-          <h3 style={{ color: "#fff", fontSize: "1.1rem", fontWeight: 800, margin: "0 0 6px" }}>Optimiser votre profil</h3>
-          <p style={{ color: "#6b7280", fontSize: "0.83rem", margin: "0 0 22px" }}>Complétez votre profil pour améliorer vos matchs</p>
-          <button className="dash-profile-btn" onClick={() => onNavigate && onNavigate("profile")}>
-            <Zap size={15} strokeWidth={2.5} /> Voir mon profil
+        <div className="relative overflow-hidden rounded-[20px] border border-[rgba(255,84,11,0.15)] bg-[rgba(255,255,255,0.03)] px-[28px] py-[40px] text-center">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[120px] w-[300px] -translate-x-1/2 -translate-y-1/2 bg-[#FF540B] opacity-[0.07] blur-[80px]" />
+          <Zap strokeWidth={2.5} className="mb-[14px] inline-block h-5 w-5 text-[#FF540B]" />
+          <h3 className="m-0 mb-[6px] text-[1.1rem] font-extrabold text-white">Optimiser votre profil</h3>
+          <p className="m-0 mb-[22px] text-[0.83rem] text-[#6b7280]">Complétez votre profil pour améliorer vos matchs</p>
+          <button className="font-sora inline-flex cursor-pointer items-center gap-[8px] rounded-[50px] border-none bg-[#FF540B] px-[28px] py-[12px] text-[0.9rem] font-bold tracking-[0.3px] text-white transition-all duration-200 ease-in hover:-translate-y-[2px] hover:bg-[#e04800] hover:shadow-[0_8px_25px_rgba(255,84,11,0.35)]" onClick={() => onNavigate && onNavigate("profile")}>
+            <Zap strokeWidth={2.5} className="h-5 w-5" /> Voir mon profil
           </button> 
         </div>
 
       </div>
-    </>
   );
-}
+} 

@@ -1,349 +1,26 @@
 import React, { useState } from "react";
 import { Sparkles, User, Lock, Eye, EyeOff } from "lucide-react";
 
-const globalCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: #161822;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .conn-card {
-    background: #1E2130;
-    border-radius: 20px;
-    padding: 32px 52px 28px;
-    width: 100%;
-    max-width: 600px;
-  }
-
-  .conn-title {
-    font-size: 28px;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.5px;
-    margin-bottom: 4px;
-  }
-
-  .conn-subtitle {
-    font-size: 13px;
-    color: #8A8FA8;
-    font-weight: 500;
-    margin-bottom: 20px;
-  }
-
-  .social-btn {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    width: 100%;
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
-    background: #2A2D3E;
-    color: #BBBFD4;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: background 0.2s, color 0.2s;
-    margin-bottom: 10px;
-    position: relative;
-  }
-  .social-btn:hover:not(:disabled) { background: #32364A; color: #ffffff; }
-  .social-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-  .social-icon-wrap {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: #3A3D52;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .social-spinner {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #4a4f6a;
-    border-top-color: #FF540B;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin-left: auto;
-  }
-
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 16px 0;
-  }
-  .divider-line { flex: 1; height: 1px; background: #2E3147; }
-  .divider-text { color: #5A5F7A; font-size: 13px; font-weight: 500; }
-
-  .input-group { margin-bottom: 14px; }
-  .input-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #BBBFD4;
-    margin-bottom: 6px;
-  }
-  .input-wrap { position: relative; display: flex; align-items: center; }
-  .input-icon {
-    position: absolute;
-    left: 14px;
-    color: #5A5F7A;
-    display: flex;
-    align-items: center;
-    pointer-events: none;
-  }
-  .conn-input {
-    width: 100%;
-    padding: 11px 14px 11px 44px;
-    background: #252838;
-    border: 1.5px solid #ff540b52;
-    border-radius: 10px;
-    color: #ffffff;
-    font-size: 15px;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .conn-input::placeholder { color: #4A4F6A; }
-  .conn-input:focus { border-color: #ff4d00; background: #2A2D3E; }
-  .conn-input.error { border-color: #e84a00; }
-
-  .eye-btn {
-    position: absolute;
-    right: 14px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #5A5F7A;
-    display: flex;
-    align-items: center;
-    padding: 0;
-    transition: color 0.2s;
-  }
-  .eye-btn:hover { color: #BBBFD4; }
-
-  .row-extras {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .custom-checkbox {
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
-    border: 1.5px solid #3A3D52;
-    background: #252838;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s, background 0.2s;
-    flex-shrink: 0;
-  }
-  .custom-checkbox.checked { background: #FF540B; border-color: #FF540B; }
-  .checkbox-text { font-size: 13px; color: #8A8FA8; font-weight: 500; }
-
-  .forgot-link {
-    font-size: 13px;
-    color: #8A8FA8;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .forgot-link:hover { color: #FF540B; }
-
-  /* ── Error banner ── */
-  .error-banner {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(232, 74, 0, 0.12);
-    border: 1px solid rgba(232, 74, 0, 0.35);
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    font-size: 13px;
-    color: #ff7043;
-    font-weight: 500;
-  }
-
-  /* ── reCAPTCHA ── */
-  .recaptcha-widget {
-    display: flex;
-    align-items: center;
-    width: 260px;
-    height: 64px;
-    background: #f9f9f9;
-    border: 1px solid #d3d3d3;
-    border-radius: 3px;
-    box-shadow: 0 2px 4px rgba(0,0,0,.08);
-    margin-bottom: 18px;
-    padding: 0 12px;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
-  }
-  .recaptcha-widget:hover { background: #f2f2f2; }
-  .recaptcha-widget::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #4285f4 0%, #34a853 33%, #fbbc05 66%, #ea4335 100%);
-  }
-
-  .rc-checkbox {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #c1c1c1;
-    border-radius: 2px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-right: 12px;
-  }
-
-  .rc-spinning {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #e0e0e0;
-    border-top-color: #4285f4;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    flex-shrink: 0;
-    margin-right: 12px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .rc-label {
-    font-size: 14px;
-    color: #333;
-    font-family: 'Roboto', 'Inter', sans-serif;
-    font-weight: 400;
-  }
-
-  .rc-branding {
-    margin-left: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    flex-shrink: 0;
-  }
-
-  .rc-brand-text {
-    font-size: 9px;
-    color: #9aa0ab;
-    font-family: 'Roboto', 'Inter', sans-serif;
-    font-weight: 400;
-    text-align: center;
-    line-height: 1.3;
-  }
-  .rc-brand-text a { color: #9aa0ab; text-decoration: none; }
-  .rc-brand-text a:hover { text-decoration: underline; }
-
-  /* ── Submit button ── */
-  .conn-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 200px;
-    margin: 0 auto 16px;
-    padding: 12px 24px;
-    border-radius: 50px;
-    border: none;
-    background: #ff540b41;
-    color: #6a6f8aba;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: not-allowed;
-    font-family: 'Inter', sans-serif;
-    transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
-    letter-spacing: 0.1px;
-  }
-  .conn-btn.active {
-    background: #FF540B;
-    color: #ffffff;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(255, 84, 11, 0.35);
-  }
-  .conn-btn.active:hover:not(:disabled) { background: #e84a00; transform: translateY(-1px); }
-  .conn-btn.active:active { transform: translateY(0); }
-  .conn-btn:disabled { cursor: not-allowed; }
-
-  .btn-spinner {
-    width: 17px;
-    height: 17px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
-  .conn-footer {
-    text-align: center;
-    font-size: 13px;
-    color: #5A5F7A;
-    font-weight: 500;
-  }
-  .conn-footer a {
-    color: #ff540bdb;
-    text-decoration: underline;
-    cursor: pointer;
-    font-weight: 600;
-    transition: color 0.2s;
-  }
-  .conn-footer a:hover { color: #e84900; }
-`;
-
 // ─── SVG icons ────────────────────────────────────────────────────────────────
 
 const GoogleG = () => (
-  <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#9AA0B4" d="M24 9.5c3.15 0 5.64 1.08 7.56 2.84l5.63-5.63C33.7 3.54 29.2 1.5 24 1.5 14.72 1.5 6.84 7.1 3.28 15.06l6.57 5.1C11.57 13.63 17.28 9.5 24 9.5z"/>
-    <path fill="#7A8099" d="M46.1 24.5c0-1.64-.15-3.22-.42-4.75H24v9h12.42c-.54 2.9-2.18 5.36-4.65 7.02l7.18 5.57C43.12 37.16 46.1 31.3 46.1 24.5z"/>
-    <path fill="#8A8FA8" d="M9.85 28.16A14.6 14.6 0 0 1 9.5 24c0-1.44.22-2.84.6-4.16l-6.57-5.1A22.45 22.45 0 0 0 1.5 24c0 3.6.86 7 2.4 10.06l5.95-5.9z"/>
-    <path fill="#6E7490" d="M24 46.5c5.2 0 9.56-1.72 12.74-4.66l-7.18-5.57c-1.76 1.18-4.02 1.88-5.56 1.88-6.72 0-12.43-4.13-14.15-9.99l-5.95 5.9C6.84 40.9 14.72 46.5 24 46.5z"/>
+  <svg width="18" height="18" viewBox="0 0 48 48" className="text-[#8A8FA8]" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M24 9.5c3.15 0 5.64 1.08 7.56 2.84l5.63-5.63C33.7 3.54 29.2 1.5 24 1.5 14.72 1.5 6.84 7.1 3.28 15.06l6.57 5.1C11.57 13.63 17.28 9.5 24 9.5z"/>
+    <path fill="currentColor" d="M46.1 24.5c0-1.64-.15-3.22-.42-4.75H24v9h12.42c-.54 2.9-2.18 5.36-4.65 7.02l7.18 5.57C43.12 37.16 46.1 31.3 46.1 24.5z"/>
+    <path fill="currentColor" d="M9.85 28.16A14.6 14.6 0 0 1 9.5 24c0-1.44.22-2.84.6-4.16l-6.57-5.1A22.45 22.45 0 0 0 1.5 24c0 3.6.86 7 2.4 10.06l5.95-5.9z"/>
+    <path fill="currentColor" d="M24 46.5c5.2 0 9.56-1.72 12.74-4.66l-7.18-5.57c-1.76 1.18-4.02 1.88-5.56 1.88-6.72 0-12.43-4.13-14.15-9.99l-5.95 5.9C6.84 40.9 14.72 46.5 24 46.5z"/>
   </svg>
 );
-
+ 
 const LinkedInIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="#7A8099" xmlns="http://www.w3.org/2000/svg">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-[#7A8099]" xmlns="http://www.w3.org/2000/svg">
     <path d="M20.447 20.452H16.89v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.981 1.981 0 0 1-1.982-1.981c0-1.094.888-1.982 1.982-1.982 1.093 0 1.98.888 1.98 1.982a1.98 1.98 0 0 1-1.98 1.981zm1.955 13.019H3.382V9h3.91v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
 );
 
 const ReCaptchaCheck = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-    <path d="M2.5 9.5l4.5 4.5 8.5-8.5" stroke="#34A853" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M2.5 9.5l4.5 4.5 8.5-8.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-[#34A853]"/>
   </svg>
 );
 
@@ -354,9 +31,9 @@ const WhiteCheck = () => (
 );
 
 const ErrorIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-    <circle cx="8" cy="8" r="7" stroke="#ff7043" strokeWidth="1.5"/>
-    <path d="M8 4.5v4M8 10.5v1" stroke="#ff7043" strokeWidth="1.5" strokeLinecap="round"/>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-[#ff7043]">
+    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+    <path d="M8 4.5v4M8 10.5v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
   </svg>
 );
 
@@ -370,17 +47,21 @@ function ReCaptcha({ checked, onChange }) {
     setTimeout(() => { setLoading(false); onChange(true); }, 1200);
   };
   return (
-    <div className="recaptcha-widget" onClick={handleClick}>
+    <div className="relative mb-[18px] flex h-[64px] w-[260px] cursor-pointer select-none items-center overflow-hidden rounded-[3px] border border-[#d3d3d3] bg-[#f9f9f9] px-[12px] shadow-[0_2px_4px_rgba(0,0,0,.08)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-[linear-gradient(90deg,#4285f4_0%,#34a853_33%,#fbbc05_66%,#ea4335_100%)] hover:bg-[#f2f2f2]" onClick={handleClick}>
       {loading
-        ? <div className="rc-spinning" />
-        : <div className={`rc-checkbox${checked ? " checked" : ""}`}>{checked && <ReCaptchaCheck />}</div>
+        ? <div className="mr-[12px] h-[24px] w-[24px] shrink-0 animate-spin rounded-full border-[2px] border-[#e0e0e0] border-t-[#4285f4]" />
+        : (
+          <div className="mr-[12px] flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded-[2px] border-[2px] border-[#c1c1c1] bg-white">
+            {checked && <ReCaptchaCheck />}
+          </div>
+        )
       }
-      <span className="rc-label">{loading ? "Vérification…" : "I'm not a robot"}</span>
-      <div className="rc-branding">
-        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" style={{ width: 34, height: 34, objectFit: "contain" }} />
-        <div className="rc-brand-text">
+      <span className="font-roboto text-[14px] font-normal text-[#333]">{loading ? "Vérification…" : "I'm not a robot"}</span>
+      <div className="ml-auto flex shrink-0 flex-col items-center gap-[3px]">
+        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" className="h-[34px] w-[34px] object-contain" />
+        <div className="font-roboto text-center text-[9px] font-normal leading-[1.3] text-[#9aa0ab]">
           reCAPTCHA<br/>
-          <a href="#" onClick={e => e.preventDefault()}>Privacy</a> - <a href="#" onClick={e => e.preventDefault()}>Terms</a>
+          <a href="#" className="text-[#9aa0ab] no-underline hover:underline" onClick={e => e.preventDefault()}>Privacy</a> - <a href="#" className="text-[#9aa0ab] no-underline hover:underline" onClick={e => e.preventDefault()}>Terms</a>
         </div>
       </div>
     </div>
@@ -480,47 +161,45 @@ export default function ConnexionPage({ onNavigate }) {
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <>
-      <style>{globalCSS}</style>
-      <div style={{ backgroundColor: "#161822", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px" }}>
-        <div className="conn-card">
-          <h1 className="conn-title">Connectez-vous</h1>
-          <p className="conn-subtitle">Accédez à votre compte MatchHub</p>
+      <div className="font-inter flex min-h-screen items-center justify-center bg-[#161822] px-[20px] py-[24px]">
+        <div className="w-full max-w-[600px] rounded-[20px] bg-[#1E2130] px-[52px] pb-[28px] pt-[32px]">
+          <h1 className="mb-[4px] text-[28px] font-extrabold tracking-[-0.5px] text-white">Connectez-vous</h1>
+          <p className="mb-[20px] text-[13px] font-medium text-[#8A8FA8]">Accédez à votre compte MatchHub</p>
 
           {/* ── Google ── */}
-          <button className="social-btn" onClick={handleGoogle} disabled={anyLoading}>
-            <div className="social-icon-wrap"><GoogleG /></div>
+          <button className="relative mb-[10px] flex w-full cursor-pointer items-center gap-[16px] rounded-[10px] border-none bg-[#2A2D3E] px-[20px] py-[10px] text-[15px] font-semibold text-[#BBBFD4] transition-[background,color] duration-200 hover:bg-[#32364A] hover:text-white disabled:cursor-not-allowed disabled:opacity-60" onClick={handleGoogle} disabled={anyLoading}>
+            <div className="flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-[8px] bg-[#3A3D52]"><GoogleG /></div>
             {loadingGoogle ? "Connexion en cours…" : "Continuer avec Google"}
-            {loadingGoogle && <div className="social-spinner" />}
+            {loadingGoogle && <div className="ml-auto h-[18px] w-[18px] animate-spin rounded-full border-[2px] border-[#4a4f6a] border-t-[#FF540B]" />}
           </button>
 
           {/* ── LinkedIn ── */}
-          <button className="social-btn" onClick={handleLinkedIn} disabled={anyLoading}>
-            <div className="social-icon-wrap"><LinkedInIcon /></div>
+          <button className="relative mb-[10px] flex w-full cursor-pointer items-center gap-[16px] rounded-[10px] border-none bg-[#2A2D3E] px-[20px] py-[10px] text-[15px] font-semibold text-[#BBBFD4] transition-[background,color] duration-200 hover:bg-[#32364A] hover:text-white disabled:cursor-not-allowed disabled:opacity-60" onClick={handleLinkedIn} disabled={anyLoading}>
+            <div className="flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-[8px] bg-[#3A3D52]"><LinkedInIcon /></div>
             {loadingLinkedIn ? "Connexion en cours…" : "Continuer avec Linkedin"}
-            {loadingLinkedIn && <div className="social-spinner" />}
+            {loadingLinkedIn && <div className="ml-auto h-[18px] w-[18px] animate-spin rounded-full border-[2px] border-[#4a4f6a] border-t-[#FF540B]" />}
           </button>
 
-          <div className="divider">
-            <div className="divider-line" />
-            <span className="divider-text">ou</span>
-            <div className="divider-line" />
+          <div className="my-[16px] flex items-center gap-[16px]">
+            <div className="h-[1px] flex-1 bg-[#2E3147]" />
+            <span className="text-[13px] font-medium text-[#5A5F7A]">ou</span>
+            <div className="h-[1px] flex-1 bg-[#2E3147]" />
           </div>
 
           {/* ── Bandeau erreur ── */}
           {error && (
-            <div className="error-banner">
+            <div className="mb-[14px] flex items-center gap-[10px] rounded-[10px] border border-[rgba(232,74,0,0.35)] bg-[rgba(232,74,0,0.12)] px-[14px] py-[10px] text-[13px] font-medium text-[#ff7043]">
               <ErrorIcon />
               {error}
             </div>
           )}
 
-          <div className="input-group">
-            <label className="input-label">Email</label>
-            <div className="input-wrap">
-              <span className="input-icon"><User size={17} /></span>
+          <div className="mb-[14px]">
+            <label className="mb-[6px] block text-[14px] font-semibold text-[#BBBFD4]">Email</label>
+            <div className="relative flex items-center">
+              <span className="pointer-events-none absolute left-[14px] flex items-center text-[#5A5F7A]"><User className="h-5 w-5" /></span>
               <input
-                className={`conn-input${error ? " error" : ""}`}
+                className={`w-full rounded-[10px] border-[1.5px] bg-[#252838] px-[14px] py-[11px] pl-[44px] text-[15px] text-white outline-none transition-[border-color,background] duration-200 placeholder:text-[#4A4F6A] focus:border-[#ff4d00] focus:bg-[#2A2D3E] ${error ? "border-[#e84a00]" : "border-[#ff540b52]"}`}
                 type="email"
                 placeholder="Adresse e-mail"
                 value={email}
@@ -529,35 +208,34 @@ export default function ConnexionPage({ onNavigate }) {
             </div>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Mot de passe</label>
-            <div className="input-wrap">
-              <span className="input-icon"><Lock size={17} /></span>
+          <div className="mb-[14px]">
+            <label className="mb-[6px] block text-[14px] font-semibold text-[#BBBFD4]">Mot de passe</label>
+            <div className="relative flex items-center">
+              <span className="pointer-events-none absolute left-[14px] flex items-center text-[#5A5F7A]"><Lock className="h-5 w-5" /></span>
               <input
-                className={`conn-input${error ? " error" : ""}`}
+                className={`w-full rounded-[10px] border-[1.5px] bg-[#252838] px-[14px] py-[11px] pl-[44px] pr-[44px] text-[15px] text-white outline-none transition-[border-color,background] duration-200 placeholder:text-[#4A4F6A] focus:border-[#ff4d00] focus:bg-[#2A2D3E] ${error ? "border-[#e84a00]" : "border-[#ff540b52]"}`}
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••••••"
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(""); }}
-                style={{ paddingRight: "44px" }}
                 onKeyDown={e => e.key === "Enter" && handleLogin()}
               />
-              <button className="eye-btn" onClick={() => setShowPassword(v => !v)} tabIndex={-1}>
-                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              <button className="absolute right-[14px] flex cursor-pointer items-center border-none bg-transparent p-0 text-[#5A5F7A] transition-colors duration-200 hover:text-[#BBBFD4]" onClick={() => setShowPassword(v => !v)} tabIndex={-1}>
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
           </div>
 
-          <div className="row-extras">
-            <div className="checkbox-label" onClick={() => setRemember(v => !v)}>
-              <div className={`custom-checkbox${remember ? " checked" : ""}`}>
+          <div className="mb-[16px] flex items-center justify-between">
+            <div className="flex cursor-pointer select-none items-center gap-[10px]" onClick={() => setRemember(v => !v)}>
+              <div className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition-[border-color,background] duration-200 ${remember ? "border-[#FF540B] bg-[#FF540B]" : "border-[#3A3D52] bg-[#252838]"}`}>
                 {remember && <WhiteCheck />}
               </div>
-              <span className="checkbox-text">Se souvenir de moi</span>
+              <span className="text-[13px] font-medium text-[#8A8FA8]">Se souvenir de moi</span>
             </div>
             <a
               href="#"
-              className="forgot-link"
+              className="cursor-pointer text-[13px] font-medium text-[#8A8FA8] no-underline transition-colors duration-200 hover:text-[#FF540B]"
               onClick={e => { e.preventDefault(); onNavigate && onNavigate("forgot-password"); }}
             >
               Mot de passe oublié ?
@@ -568,24 +246,23 @@ export default function ConnexionPage({ onNavigate }) {
 
           {/* ── Se connecter ── */}
           <button
-            className={`conn-btn${canSubmit ? " active" : ""}`}
+            className={`mx-auto mb-[16px] flex w-full max-w-[200px] items-center justify-center gap-[10px] rounded-[50px] border-none px-[24px] py-[12px] text-[16px] font-bold tracking-[0.1px] transition-[background,color,transform,box-shadow] duration-300 ${canSubmit ? "cursor-pointer bg-[#FF540B] text-white shadow-[0_4px_20px_rgba(255,84,11,0.35)] hover:bg-[#e84a00] hover:-translate-y-[1px] active:translate-y-0" : "cursor-not-allowed bg-[#ff540b41] text-[#6a6f8aba]"}`}
             disabled={!canSubmit}
             onClick={handleLogin}
           >
             {loadingLogin
-              ? <><div className="btn-spinner" />Connexion…</>
-              : <><Sparkles size={17} strokeWidth={2} />Se connecter</>
+              ? <><div className="h-[17px] w-[17px] animate-spin rounded-full border-[2px] border-[rgba(255,255,255,0.3)] border-t-white" />Connexion…</>
+              : <><Sparkles strokeWidth={2} className="h-5 w-5" />Se connecter</>
             }
           </button>
 
-          <p className="conn-footer">
+          <p className="text-center text-[13px] font-medium text-[#5A5F7A]">
             Nouveau sur MatchHub ?&nbsp;
-            <a href="#" onClick={e => { e.preventDefault(); onNavigate && onNavigate("signup"); }}>
+            <a href="#" className="cursor-pointer font-semibold text-[#ff540bdb] underline transition-colors duration-200 hover:text-[#e84900]" onClick={e => { e.preventDefault(); onNavigate && onNavigate("signup"); }}>
               Créez votre compte
             </a>
           </p>
         </div>
       </div>
-    </>
   );
 }

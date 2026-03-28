@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './App.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Accueil from './pages/Accueil'
@@ -17,7 +16,7 @@ function App() {
       case 'matchmaking':
         return <Matchmaking onNavigate={setRoute} />
       case 'signin':
-        return <SignIn onNavigate={setRoute} />
+        return <SignIn onNavigate={setRoute} /> 
       case 'signup':
         return <SignUp onNavigate={setRoute} />
       case 'profile':
@@ -31,13 +30,13 @@ function App() {
   }
 
   return (
-    <div className="app-root">
+    <div className="font-inter flex min-h-screen w-full flex-col overflow-x-hidden">
       <Navbar
         currentPage={route}
         onNavigate={setRoute}
         hideNav={!['accueil', 'matchmaking', 'dashboard'].includes(route)}
       />
-      <main>
+      <main className="w-full flex-1 p-0">
         {renderPage()}
       </main>
       {['accueil', 'matchmaking', 'dashboard'].includes(route) && (

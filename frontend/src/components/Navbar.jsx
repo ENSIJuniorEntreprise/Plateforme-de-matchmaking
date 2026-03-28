@@ -7,14 +7,16 @@ const AUTH_PAGES    = ["signin", "signup"];
 const DASHBOARD_PAGES = ["profile", "settings" , "forgot-password" , "reset-password" , "verify-email" , "profile-edit" , "email-preferences" , "delete-account" , "two-factor-auth" , "sessions" , "api-tokens"];
 const DEFAULT_PAGES = ["accueil", "matchmaking", "dashboard"];
 
-const NAVBAR_VARIANTS = {
-  default: { 
-    headerHeight: 102,
-    innerMarginTop: 25,
+const NAVBAR_VARIANTS = { 
+  default: {
+    headerClass: "h-[102px]",
+    innerMarginTopClass: "mt-[25px]",
+    spacerClass: "h-[102px]",
   },
   auth: {
-    headerHeight: 90,
-    innerMarginTop: 1,
+    headerClass: "h-[90px]",
+    innerMarginTopClass: "mt-[1px]",
+    spacerClass: "h-[90px]",
   },
 };
 
@@ -65,89 +67,6 @@ const navItems = [
   { id: "dashboard",   name: "Dashboard",   icon: "bar-chart-outline" },
 ];
 
-// ─── Global CSS ───────────────────────────────────────────────────────────────
-
-const globalCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap');
-
-  .nav-indicator::before {
-    content: '';
-    position: absolute;
-    top: 77%;
-    left: -11px;
-    width: 17px;
-    height: 18px;
-    background: transparent;
-    border-top-right-radius: 30px;
-    box-shadow: 1px -8px 0 0 #20222C;
-    rotate: -10deg;
-  }
-
-  .nav-indicator::after {
-    content: '';
-    position: absolute;
-    top: 76.2%;
-    right: -13px;
-    width: 18px;
-    height: 19px;
-    background: transparent;
-    border-top-left-radius: 30px;
-    box-shadow: -1px -8px 0 0 #20222C;
-    rotate: 15deg;
-  }
-
-  .nav-icon {
-    display: block;
-    line-height: 60px;
-    font-size: 1.5em;
-    text-align: center;
-    transition: 0.5s;
-    color: #3F3F3F;
-    transform: translateY(0);
-    margin-bottom: 10px;
-  }
-
-  .nav-icon.active {
-    transform: translateY(-32px);
-    color: #3F3F3F;
-  }
-
-  .mh-btn-conn {
-    background: none;
-    border: none;
-    color: white;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: color 0.2s;
-    letter-spacing: 0.2px;
-  }
-  .mh-btn-conn:hover { color: #FF540B; }
-
-  .mh-btn-start {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 18px;
-    border-radius: 12px;
-    border: 1.5px solid #ff540b69;
-    background: transparent;
-    color: #ff540b69;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.2s ease;
-    letter-spacing: 0.2px;
-  }
-  .mh-btn-start:hover {
-    border-color: #FF540B;
-    background: rgba(255, 84, 11, 0.10);
-    color: #FF540B;
-  }
-`;
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
@@ -159,6 +78,16 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
   }, [currentPage]);
 
   const handleNav = (id) => {
+    // Apply logo-like behavior only to main nav links
+    if (DEFAULT_PAGES.includes(id)) {
+      if (currentPage !== id) {
+        setActive(id);
+        if (onNavigate) onNavigate(id);
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     setActive(id);
     if (onNavigate) onNavigate(id);
   };
@@ -177,74 +106,73 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
   const activeIndex = navItems.findIndex((item) => item.id === active);
 
   const resolvedVariant = variant ?? getVariant(currentPage);
-  const { headerHeight, innerMarginTop } = NAVBAR_VARIANTS[resolvedVariant];
+  const { headerClass, innerMarginTopClass, spacerClass } = NAVBAR_VARIANTS[resolvedVariant];
 
   const { showConnexion, showCommencer } = getRightButtons(active);
   const isSingleAuthButton = (active === "signin" || active === "signup");
+  const gridClass = hideNav || AUTH_PAGES.includes(active) || DASHBOARD_PAGES.includes(active)
+    ? "grid-cols-[auto_1fr]"
+    : "grid-cols-[1fr_auto_1fr]";
+  const indicatorTranslate = activeIndex === 0
+    ? "translate-x-[20px]"
+    : activeIndex === 1
+      ? "translate-x-[120px]"
+      : activeIndex === 2
+        ? "translate-x-[220px]"
+        : "translate-x-0";
 
   return (
     <>
-      <style>{globalCSS}</style>
-
-      <header style={{ ...styles.header, height: headerHeight }}>
-        <div
-          style={{
-            ...styles.inner,
-            marginTop: innerMarginTop,
-            gridTemplateColumns: hideNav || AUTH_PAGES.includes(active) || DASHBOARD_PAGES.includes(active)
-              ? "auto 1fr"
-              : "1fr auto 1fr",
-          }}
-        >
+      <header className={`fixed left-0 right-0 top-0 z-[100] border-b border-[#2a2d35] bg-[#20222C] ${headerClass}`}>
+        <div className={`grid h-[90px] w-full items-center px-[clamp(1rem,3vw,40px)] ${innerMarginTopClass} ${gridClass}`}>
 
           {/* Logo */}
-          <div onClick={handleLogoClick} style={styles.logo}>
-            <div style={styles.logoIcon}>
-              <Sparkles size={20} color="white" strokeWidth={2} />
+          <div onClick={handleLogoClick} className="flex cursor-pointer select-none items-center justify-self-start gap-[5px]">
+            <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[40%] bg-[#FF540B]">
+              <Sparkles strokeWidth={2} className="h-5 w-5 text-white" />
             </div>
-            <span style={styles.logoText}>
-              Match<span style={{ color: "#FF540B" }}>Hub</span>
+            <span className="font-inter text-[20px] font-bold tracking-[-0.3px] text-white">
+              Match<span className="text-[#FF540B]">Hub</span>
             </span>
           </div>
 
           {/* Nav pill — hidden on auth pages or when hideNav is set */}
           {!hideNav && (
-            <nav style={{ position: "relative" }}>
-              <div style={styles.navigation}>
-                <ul style={styles.ul}>
+            <nav className="relative">
+              <div className="relative flex h-[50px] w-[320px] items-center justify-center justify-self-center rounded-[10px] bg-[#3F3F3F]">
+                <ul className="relative m-0 flex w-[300px] list-none p-0">
                   {navItems.map((item) => {
                     const isActive = active === item.id;
                     return (
                       <li
                         key={item.id}
                         onClick={() => handleNav(item.id)}
-                        style={styles.li}
+                        className="group relative z-[1] h-[70px] w-[100px] cursor-pointer"
                       >
                         <a
                           href="#"
                           onClick={(e) => e.preventDefault()}
-                          style={styles.a}
+                          className="font-inter relative flex h-full w-full flex-col items-center justify-center text-center font-medium no-underline"
                         >
-                          <span className={`nav-icon${isActive ? " active" : ""}`}>
+                          <span className={`mb-[10px] block text-center text-[1.5em] leading-[60px] text-[#3F3F3F] transition duration-500 ${isActive ? "-translate-y-[32px]" : "translate-y-0"}`}>
                             <ion-icon name={item.icon} />
                           </span>
-                          <span style={styles.text}>{item.name}</span>
+                          <span
+                            className={`font-inter absolute bottom-[22px] text-[0.725rem] font-[550] tracking-[0.05rem] opacity-100 transition-all duration-300 ease-out ${
+                              isActive
+                                ? "text-[#FF540B]"
+                                : "text-white group-hover:-translate-y-1 group-hover:scale-105 group-hover:text-[#FF540B]"
+                            }`}
+                          >
+                            {item.name}
+                          </span>
                         </a>
                       </li>
                     );
                   })}
 
                   <div
-                    className="nav-indicator"
-                    style={{
-                      ...styles.indicator,
-                      transform:
-                        activeIndex >= 0
-                          ? `translateX(calc(100px * ${activeIndex} + 20px))`
-                          : "translateX(0)",
-                      opacity: activeIndex >= 0 ? 1 : 0,
-                      pointerEvents: activeIndex >= 0 ? "auto" : "none",
-                    }}
+                    className={`before:content-[''] after:content-[''] absolute top-[-50%] h-[60px] w-[60px] rounded-full border-[6px] border-[#20222C] bg-[#FF540B] transition-transform duration-500 before:absolute before:left-[-11px] before:top-[77%] before:h-[18px] before:w-[17px] before:rotate-[-10deg] before:rounded-tr-[30px] before:bg-transparent before:shadow-[1px_-8px_0_0_#20222C] after:absolute after:right-[-13px] after:top-[76.2%] after:h-[19px] after:w-[18px] after:rotate-[15deg] after:rounded-tl-[30px] after:bg-transparent after:shadow-[-1px_-8px_0_0_#20222C] ${indicatorTranslate} ${activeIndex >= 0 ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
                   />
                 </ul>
               </div>
@@ -252,21 +180,15 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
           )}
 
           {/* Right buttons */}
-          <div
-            style={{
-              ...styles.right,
-              justifySelf: "end",
-              gridColumn: isSingleAuthButton && hideNav ? "3" : undefined,
-            }}
-          >
+          <div className={`flex items-center justify-self-end gap-[20px] ${isSingleAuthButton && hideNav ? "col-start-3" : ""}`}>
             {showConnexion && (
-              <button className="mh-btn-conn" onClick={() => handleNav("signin")}>
+              <button className="font-inter cursor-pointer border-none bg-transparent text-[15px] font-bold tracking-[0.2px] text-white transition-colors duration-200 hover:text-[#FF540B]" onClick={() => handleNav("signin")}>
                 Connexion
               </button>
             )}
             {showCommencer && (
-              <button className="mh-btn-start" onClick={() => handleNav("signup")}>
-                <Sparkles size={15} strokeWidth={2} />
+              <button className="font-inter flex cursor-pointer items-center gap-[10px] rounded-[12px] border-[1.5px] border-[#ff540b69] bg-transparent px-[18px] py-[8px] text-[14px] font-semibold tracking-[0.2px] text-[#ff540b69] transition-all duration-200 ease-in hover:border-[#FF540B] hover:bg-[rgba(255,84,11,0.10)] hover:text-[#FF540B]" onClick={() => handleNav("signup")}>
+                <Sparkles strokeWidth={2} className="h-5 w-5" />
                 Commencer
               </button>
             )}
@@ -276,120 +198,7 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant }) {
       </header>
 
       {/* Spacer */}
-      <div style={{ height: headerHeight }} />
+      <div className={spacerClass} />
     </>
   );
 }
-
-// ─── Static styles ────────────────────────────────────────────────────────────
-
-const styles = {
-  header: {
-    backgroundColor: "#20222C",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    borderBottom: "1px solid #2a2d35",
-  },
-  inner: {
-    width: "100%",
-    display: "grid",
-    gridTemplateColumns: "1fr auto 1fr",
-    alignItems: "center",
-    padding: "0 clamp(1rem, 3vw, 40px)",
-    height: "90px",
-  },
-  logo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-    cursor: "pointer",
-    userSelect: "none",
-    justifySelf: "start",
-  },
-  logoIcon: {
-    backgroundColor: "#FF540B",
-    borderRadius: "40%",
-    width: "40px",
-    height: "40px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  logoText: {
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "white",
-    letterSpacing: "-0.3px",
-    fontFamily: '"Inter", sans-serif',
-  },
-  navigation: {
-    position: "relative",
-    width: "320px",
-    height: "50px",
-    backgroundColor: "#3F3F3F",
-    borderRadius: "10px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    justifySelf: "center",
-  },
-  ul: {
-    display: "flex",
-    width: "300px",
-    padding: 0,
-    margin: 0,
-    listStyle: "none",
-    position: "relative",
-  },
-  li: {
-    position: "relative",
-    width: "100px",
-    height: "70px",
-    zIndex: 1,
-    cursor: "pointer",
-  },
-  a: {
-    position: "relative",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    textAlign: "center",
-    fontWeight: 500,
-    textDecoration: "none",
-    fontFamily: '"Inter", sans-serif',
-  },
-  text: {
-    position: "absolute",
-    bottom: "22px",
-    color: "#fff",
-    fontWeight: 550,
-    fontSize: "0.725rem",
-    letterSpacing: "0.05rem",
-    transition: "0.5s",
-    opacity: 1,
-    fontFamily: '"Inter", sans-serif',
-  },
-  indicator: {
-    position: "absolute",
-    top: "-50%",
-    width: "60px",
-    height: "60px",
-    backgroundColor: "#FF540B",
-    borderRadius: "50%",
-    border: "6px solid #20222C",
-    transition: "transform 0.5s",
-  },
-  right: {
-    display: "flex",
-    gap: "20px",
-    alignItems: "center",
-    justifySelf: "end",
-  },
-};
