@@ -69,18 +69,28 @@ function StepIcon({ step, visible }) {
         transform: visible ? "scale(1)" : "scale(0.7)",
       }}
     >
-      {/* Glow */}
       <div
         style={{
           position: "absolute",
-          inset: -20,
+          inset: -6,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,84,11) 0%, rgba(234,88,12) 50%, transparent 75%)",
-          filter: "blur(8px)",
+          background: "radial-gradient(circle, rgba(255,84,11,0.25) 0%, transparent 70%)",
+          filter: "blur(10px)",
           zIndex: 0,
         }}
       />
-      {/* Number badge */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "50%",
+          background: "rgba(255, 255, 255, 0.04)",
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 0 20px rgba(255,84,11,0.15)",
+          backdropFilter: "blur(8px)",
+          zIndex: 1,
+        }}
+      />
       <div
         style={{
           position: "absolute",
@@ -89,50 +99,100 @@ function StepIcon({ step, visible }) {
           width: 22,
           height: 22,
           borderRadius: "50%",
-          border: "2px solid #FF540B",
-          background: "#20222C",
+          border: "1.5px solid rgba(255,84,11,0.7)",
+          background: "rgba(20, 22, 30, 0.85)",
+          backdropFilter: "blur(4px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: 11,
           fontWeight: 700,
           color: "#FF540B",
-          zIndex: 2,
-          fontFamily: "inherit",
+          zIndex: 3,
+          fontFamily: "'Inter', sans-serif",
         }}
       >
         {step.number}
       </div>
-      {/* Icon */}
-      <div style={{ position: "relative", zIndex: 1 }}>{step.icon}</div>
+      <div style={{ position: "relative", zIndex: 2 }}>{step.icon}</div>
     </div>
   );
 }
 
 function StepCard({ step, visible }) {
   const isLeft = step.side === "left";
+  const [hovered, setHovered] = useState(false);
+
   return (
     <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: "rgba(32,34,44)",
-        border: "1px solid rgba(255,255,255)",
-        borderRadius: 14,
-        padding: "22px 28px",
+        position: "relative",
         maxWidth: 300,
-        backdropFilter: "blur(6px)",
-        transition: "opacity 0.6s ease, transform 0.6s ease",
+        borderRadius: 20,
+        padding: "24px 28px",
+        overflow: "hidden",
+        cursor: "default",
+        background: hovered
+          ? "rgba(255, 255, 255, 0.07)"
+          : "rgba(255, 255, 255, 0.03)",
+        border: hovered
+          ? "1px solid rgba(255, 255, 255, 0.2)"
+          : "1px solid rgba(255, 255, 255, 0.08)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        boxShadow: hovered
+          ? "0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 30px rgba(255,84,11,0.08)"
+          : "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
+        transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         opacity: visible ? 1 : 0,
         transform: visible
-          ? "translateX(0)"
+          ? hovered
+            ? "translateX(0) translateY(-3px) scale(1.02)"
+            : "translateX(0)"
           : isLeft
           ? "translateX(-40px)"
           : "translateX(40px)",
       }}
     >
+      {/* Shimmer line on top */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "15%",
+          right: "15%",
+          height: 1,
+          background: hovered
+            ? "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)"
+            : "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+          transition: "all 0.35s ease",
+          borderRadius: "0 0 4px 4px",
+        }}
+      />
+
+      {/* Orange glow bottom-corner on hover */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: -30,
+          right: -30,
+          width: 100,
+          height: 100,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,84,11,0.18) 0%, transparent 70%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.4s ease",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Content */}
       <h3
         style={{
           margin: "0 0 8px",
-          fontFamily: "'Sora', 'Outfit', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontWeight: 700,
           fontSize: 16,
           color: "#ffffff",
@@ -144,9 +204,9 @@ function StepCard({ step, visible }) {
       <p
         style={{
           margin: 0,
-          fontFamily: "'Sora', 'Outfit', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 13.5,
-          color: "rgba(127,131,147)",
+          color: "rgba(180,183,200,0.85)",
           lineHeight: 1.6,
           textAlign: isLeft ? "center" : "left",
         }}
@@ -187,9 +247,8 @@ export default function HowItWorks() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-        /* Animation de scintillement doux */
         @keyframes shine {
           0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 84, 11, 0.5), 0 0 20px rgba(255, 84, 11, 0.3); }
           50% { opacity: 0.9; text-shadow: 0 0 15px rgba(255, 84, 11, 0.8), 0 0 30px rgba(255, 84, 11, 0.5); }
@@ -218,7 +277,7 @@ export default function HowItWorks() {
           flexDirection: "column",
           alignItems: "center",
           padding: "80px 20px 100px",
-          fontFamily: "'Sora', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           position: "relative",
           overflow: "hidden",
         }}
@@ -258,7 +317,6 @@ export default function HowItWorks() {
             zIndex: 1,
           }}
         >
-          {/* Vertical line */}
           <div
             style={{
               position: "absolute",
@@ -286,7 +344,6 @@ export default function HowItWorks() {
                   zIndex: 1,
                 }}
               >
-                {/* Card side */}
                 <div
                   style={{
                     flex: 1,
@@ -299,7 +356,6 @@ export default function HowItWorks() {
                   <StepCard step={step} visible={visible[i]} />
                 </div>
 
-                {/* Center icon */}
                 <div
                   style={{
                     position: "absolute",
@@ -311,7 +367,6 @@ export default function HowItWorks() {
                   <StepIcon step={step} visible={visible[i]} />
                 </div>
 
-                {/* Empty side */}
                 <div style={{ flex: 1 }} />
               </div>
             );

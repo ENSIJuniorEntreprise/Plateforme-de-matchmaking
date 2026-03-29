@@ -52,7 +52,6 @@ export default function Testimonials() {
   const prev = () => goTo((current - 1 + testimonials.length) % testimonials.length, "prev");
   const next = () => goTo((current + 1) % testimonials.length, "next");
 
-  // Auto-advance
   useEffect(() => {
     const timer = setInterval(() => {
       goTo((current + 1) % testimonials.length, "next");
@@ -65,9 +64,8 @@ export default function Testimonials() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-        /* Effet Shiny identique aux autres sections */
         @keyframes shine {
           0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 84, 11, 0.5), 0 0 20px rgba(255, 84, 11, 0.3); }
           50% { opacity: 0.9; text-shadow: 0 0 15px rgba(255, 84, 11, 0.8), 0 0 30px rgba(255, 84, 11, 0.5); }
@@ -115,6 +113,7 @@ export default function Testimonials() {
           justify-content: center;
           transition: all 0.2s;
           font-size: 22px;
+          font-family: 'Inter', sans-serif;
         }
         .nav-btn:hover {
           background: rgba(255,255,255,0.08);
@@ -132,7 +131,7 @@ export default function Testimonials() {
           alignItems: "center",
           justifyContent: "center",
           padding: "80px 20px",
-          fontFamily: "'Sora', sans-serif",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
         {/* Header */}
@@ -220,6 +219,7 @@ export default function Testimonials() {
                   fontSize: 13,
                   fontWeight: 700,
                   color: "white",
+                  fontFamily: "'Inter', sans-serif",
                   boxShadow: "0 4px 12px rgba(255, 84, 11, 0.4)",
                 }}
               >
@@ -244,6 +244,7 @@ export default function Testimonials() {
                   color: "rgba(255,255,255,0.85)",
                   fontStyle: "italic",
                   lineHeight: 1.7,
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 {t.quote}
@@ -257,6 +258,7 @@ export default function Testimonials() {
                     fontSize: 15,
                     color: "#ffffff",
                     marginBottom: 2,
+                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   {t.name}
@@ -265,6 +267,7 @@ export default function Testimonials() {
                   style={{
                     fontSize: 13,
                     color: "rgba(127,131,147)",
+                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   {t.role}
