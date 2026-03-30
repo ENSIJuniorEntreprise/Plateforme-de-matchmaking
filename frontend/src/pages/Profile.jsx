@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 /* ── Data ───────────────────────────────────────────────── */
 const DATA = {
   name: "TechFlow AI",
@@ -82,7 +82,10 @@ function MatchScore({ score }) {
           </div>
         </div>
       </div>
-      <button className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-orange-500/30 hover:scale-[1.02]">
+      <button
+        onClick={() => { window.location.href = "/Matchmaking.jsx"; }}
+        className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-orange-500/30 hover:scale-[1.02]"
+      >
         <Ico n="bolt" s={14} c="#fff" /> Match
       </button>
     </div>
@@ -96,8 +99,19 @@ function Accomplishments({ items }) {
       <p className="text-white font-bold text-sm mb-3">Accomplissement</p>
       <div className="flex flex-col gap-2">
         {items.map((item, i) => (
-          <div key={i} className="bg-[#11141d] rounded-xl px-3 py-2 flex items-center gap-3 border border-white/[0.05]">
-            <span className="text-base">{item.icon}</span>
+<div key={i} className="bg-[#11141d] rounded-xl px-3 py-2 flex items-center gap-3 border border-white/[0.05] cursor-default"
+  style={{ transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.25s ease" }}
+  onMouseEnter={e => {
+    e.currentTarget.style.transform = "scale(1.06)";
+    e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,115,22,0.25)";
+    e.currentTarget.style.borderColor = "rgba(249,115,22,0.4)";
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.boxShadow = "none";
+    e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
+  }}
+>            <span className="text-base">{item.icon}</span>
             <span className="text-gray-200 text-sm font-medium">{item.label}</span>
           </div>
         ))}
@@ -192,7 +206,7 @@ export default function ProfilePage() {
   const [favori, setFavori] = useState(false);
   const [partagerVisible, setPartagerVisible] = useState(false);
   const [contactVisible, setContactVisible] = useState(false);
-
+  
   function changeTab(i) {
     if (i === tab || out) return;
     setDir(i > tab ? 1 : -1);
@@ -281,7 +295,7 @@ export default function ProfilePage() {
   {/* Ajouter aux favoris */}
   <button
     onClick={() => setFavori(!favori)}
-    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xm font-semibold transition-all duration-200 border ${
+    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xm font-semibold transition-all duration-200 border hover:border-orange-400 ${
       favori
         ? "bg-orange-500 text-white border-orange-500"
         : "border-orange-500/60 text-orange-400 bg-transparent"
@@ -323,7 +337,8 @@ export default function ProfilePage() {
         {/* Facebook */}
         <a href="https://www.facebook.com/login" target="_blank" rel="noreferrer"
           className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl bg-[#1877F2] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+          <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+
             <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
               <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
             </svg>
@@ -429,6 +444,16 @@ export default function ProfilePage() {
                 transform: out ? `translateX(${dir * 20}px) scale(0.982)` : "translateX(0) scale(1)",
                 transition: "opacity 0.22s ease, transform 0.22s ease",
               }}
+ onMouseEnter={e => {
+    e.currentTarget.style.transform = "scale(1.01)";
+    e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,115,22,0.25)";
+    e.currentTarget.style.borderColor = "rgba(249,115,22,0.4)";
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.transform = out ? `translateX(${dir * 20}px) scale(0.982)` : "translateX(0) scale(1)";
+    e.currentTarget.style.boxShadow = "";
+    e.currentTarget.style.borderColor = "";
+  }}
             >
               {/* A PROPOS */}
               {tab === 0 && (
