@@ -52,7 +52,6 @@ export default function Testimonials() {
   const prev = () => goTo((current - 1 + testimonials.length) % testimonials.length, "prev");
   const next = () => goTo((current + 1) % testimonials.length, "next");
 
-  // Auto-advance
   useEffect(() => {
     const timer = setInterval(() => {
       goTo((current + 1) % testimonials.length, "next");
@@ -65,7 +64,25 @@ export default function Testimonials() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+        @keyframes shine {
+          0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 84, 11, 0.5), 0 0 20px rgba(255, 84, 11, 0.3); }
+          50% { opacity: 0.9; text-shadow: 0 0 15px rgba(255, 84, 11, 0.8), 0 0 30px rgba(255, 84, 11, 0.5); }
+        }
+
+        @keyframes moveGradient {
+          to { background-position: 200% center; }
+        }
+
+        .text-shiny {
+          background: linear-gradient(135deg, #FF540B 0%, #ff8c5a 50%, #FF540B 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-size: 200% auto;
+          animation: shine 3s ease-in-out infinite, moveGradient 5s linear infinite;
+          display: inline-block;
+        }
 
         @keyframes slideInNext {
           from { opacity: 0; transform: translateX(40px); }
@@ -74,14 +91,6 @@ export default function Testimonials() {
         @keyframes slideInPrev {
           from { opacity: 0; transform: translateX(-40px); }
           to   { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideOutNext {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(-40px); }
-        }
-        @keyframes slideOutPrev {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(40px); }
         }
 
         .testimonial-card-enter-next {
@@ -95,18 +104,21 @@ export default function Testimonials() {
           width: 44px;
           height: 44px;
           border-radius: 50%;
-          background: rgba(255,255,255,0);
-          border: 1px solid rgba(255,255,255,0);
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.1);
           color: white;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: background 0.2s;
-          font-size: 16px;
+          transition: all 0.2s;
+          font-size: 22px;
+          font-family: 'Inter', sans-serif;
         }
         .nav-btn:hover {
-          background: rgba(255,255,255,0);
+          background: rgba(255,255,255,0.08);
+          border-color: #FF540B;
+          color: #FF540B;
         }
       `}</style>
 
@@ -119,7 +131,7 @@ export default function Testimonials() {
           alignItems: "center",
           justifyContent: "center",
           padding: "80px 20px",
-          fontFamily: "'Sora', sans-serif",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
         {/* Header */}
@@ -133,14 +145,15 @@ export default function Testimonials() {
               letterSpacing: "-0.5px",
             }}
           >
-            Ce qu'ils{" "}
-            <span style={{ color: "#ea580c" }}>en disent</span>
+            Ce qu'ils <span className="text-shiny">en disent</span>
           </h2>
           <p
             style={{
               margin: 0,
               fontSize: 16,
               color: "rgba(255,255,255,0.5)",
+              maxWidth: 500,
+              lineHeight: 1.6,
             }}
           >
             Des témoignages de professionnels qui ont transformé leur réseau.
@@ -166,6 +179,7 @@ export default function Testimonials() {
               display: "flex",
               gap: 32,
               alignItems: "flex-start",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
             }}
           >
             {/* Avatar */}
@@ -205,6 +219,8 @@ export default function Testimonials() {
                   fontSize: 13,
                   fontWeight: 700,
                   color: "white",
+                  fontFamily: "'Inter', sans-serif",
+                  boxShadow: "0 4px 12px rgba(255, 84, 11, 0.4)",
                 }}
               >
                 "
@@ -228,6 +244,7 @@ export default function Testimonials() {
                   color: "rgba(255,255,255,0.85)",
                   fontStyle: "italic",
                   lineHeight: 1.7,
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 {t.quote}
@@ -241,6 +258,7 @@ export default function Testimonials() {
                     fontSize: 15,
                     color: "#ffffff",
                     marginBottom: 2,
+                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   {t.name}
@@ -249,6 +267,7 @@ export default function Testimonials() {
                   style={{
                     fontSize: 13,
                     color: "rgba(127,131,147)",
+                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   {t.role}
@@ -274,11 +293,11 @@ export default function Testimonials() {
                   width: i === current ? 28 : 8,
                   height: 8,
                   borderRadius: 4,
-                  background: i === current ? "#FF540B" : "rgba(127,131,147)",
+                  background: i === current ? "#FF540B" : "rgba(127,131,147, 0.3)",
                   border: "none",
                   cursor: "pointer",
                   padding: 0,
-                  transition: "width 0.3s ease, background 0.3s ease",
+                  transition: "all 0.3s ease",
                 }}
                 aria-label={`Témoignage ${i + 1}`}
               />

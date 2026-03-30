@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 
-// ─── Stars background (couvre toute la page) ──────────────────────────────────
 function StarCanvas() {
   const canvasRef = useRef(null);
   useEffect(() => {
@@ -49,37 +48,45 @@ function StarCanvas() {
     <canvas
       ref={canvasRef}
       style={{
-        position: "fixed",   // fixed = reste en place pendant le scroll
+        position: "fixed",
         top: 0, left: 0,
         width: "100%",
         height: "100%",
         pointerEvents: "none",
-        zIndex: 0,           // derrière tout le contenu
+        zIndex: 0,
       }}
     />
   );
 }
 
-// ─── Stat ──────────────────────────────────────────────────────────────────────
 function Stat({ value, label }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-      <span style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, color: "#FF540B", letterSpacing: "-0.02em" }}>{value}</span>
-      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem" }}>{label}</span>
+      <span className="text-shiny" style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, letterSpacing: "-0.02em" }}>
+        {value}
+      </span>
+      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem", whiteSpace: "nowrap" }}>{label}</span>
     </div>
   );
 }
 
-// ─── Matching Graph ────────────────────────────────────────────────────────────
 function MatchingGraph() {
   const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+  const hoveredRef = useRef(null);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     let animId, t = 0;
-    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
     resize();
     window.addEventListener("resize", resize);
+
     const nodes = [
       { id: "TE", label: "TechFlow",   type: "startup",      x: 0.28, y: 0.38 },
       { id: "AI", label: "AIBot",      type: "startup",      x: 0.42, y: 0.58 },
@@ -92,45 +99,162 @@ function MatchingGraph() {
     ];
     const edges = [[0,5],[0,1],[0,3],[1,3],[1,4],[2,6],[2,7],[4,5],[5,6],[2,4]];
     const typeColor = { startup: "#FF540B", talent: "#38bdf8", investisseur: "#34d399" };
+
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      mouseRef.current = { x: mx, y: my };
+
+      const w = canvas.width, h = canvas.height;
+      let found = null;
+      nodes.forEach((n, i) => {
+        const nx = n.x * w, ny = n.y * h;
+        const dist = Math.sqrt((mx - nx) ** 2 + (my - ny) ** 2);
+        if (dist < 40) found = i;
+      });
+      hoveredRef.current = found;
+    };
+
+    const handleMouseLeave = () => {
+      hoveredRef.current = null;
+    };
+
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+
     const draw = () => {
       t += 0.008;
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
+
+      const hovered = hoveredRef.current;
+
+      // Draw edges
       edges.forEach(([a, b], i) => {
         const na = nodes[a], nb = nodes[b];
-        const x1 = na.x*w, y1 = na.y*h, x2 = nb.x*w, y2 = nb.y*h;
-        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
-        ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1.5; ctx.stroke();
-        const progress = ((t*0.6 + i*0.37) % 1);
-        const px = x1 + (x2-x1)*progress, py = y1 + (y2-y1)*progress;
-        ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI*2);
-        ctx.fillStyle = typeColor[nodes[a].type]; ctx.globalAlpha = 0.8; ctx.fill(); ctx.globalAlpha = 1;
+        const x1 = na.x * w, y1 = na.y * h;
+        const x2 = nb.x * w, y2 = nb.y * h;
+
+        const isHighlighted = hovered !== null && (a === hovered || b === hovered);
+
+        if (isHighlighted) {
+          // Glow effect pour la ligne
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = "rgba(255,84,11,0.25)";
+          ctx.lineWidth = 8;
+          ctx.stroke();
+          ctx.restore();
+
+          // Ligne orange vive
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = "#FF540B";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = hovered !== null ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.07)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        // Particule animée seulement sur les lignes non survolées
+        if (!isHighlighted) {
+          const progress = ((t * 0.6 + i * 0.37) % 1);
+          const px = x1 + (x2 - x1) * progress;
+          const py = y1 + (y2 - y1) * progress;
+          ctx.beginPath();
+          ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = typeColor[nodes[a].type];
+          ctx.globalAlpha = hovered !== null ? 0.2 : 0.8;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
       });
-      nodes.forEach((n) => {
-        const x = n.x*w, y = n.y*h, color = typeColor[n.type], r = 28;
-        const grd = ctx.createRadialGradient(x,y,0,x,y,r*2);
-        grd.addColorStop(0, color+"33"); grd.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(x,y,r*2,0,Math.PI*2); ctx.fillStyle = grd; ctx.fill();
-        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-        ctx.fillStyle = "#20222C"; ctx.fill();
-        ctx.strokeStyle = color+"99"; ctx.lineWidth = 2; ctx.stroke();
-        ctx.fillStyle = "#fff"; ctx.font = `bold ${r*0.65}px 'Sora',sans-serif`;
-        ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(n.id.slice(0,2), x, y);
-        ctx.fillStyle = "#fff"; ctx.font = `600 12px 'Sora',sans-serif`; ctx.fillText(n.label, x, y+r+14);
-        ctx.fillStyle = color; ctx.font = `500 10px 'Sora',sans-serif`;
-        ctx.fillText(n.type.charAt(0).toUpperCase()+n.type.slice(1), x, y+r+28);
+
+      // Draw nodes
+      nodes.forEach((n, i) => {
+        const x = n.x * w, y = n.y * h;
+        const color = typeColor[n.type];
+        const r = 28;
+        const isHovered = hovered === i;
+        const isDimmed = hovered !== null && !isHovered;
+
+        // Glow radial
+        const glowSize = isHovered ? r * 3 : r * 2;
+        const grd = ctx.createRadialGradient(x, y, 0, x, y, glowSize);
+        grd.addColorStop(0, isHovered ? color + "55" : color + "33");
+        grd.addColorStop(1, "transparent");
+        ctx.beginPath();
+        ctx.arc(x, y, glowSize, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.globalAlpha = isDimmed ? 0.3 : 1;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Cercle principal
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "#20222C";
+        ctx.globalAlpha = isDimmed ? 0.5 : 1;
+        ctx.fill();
+        ctx.strokeStyle = isHovered ? color : color + "99";
+        ctx.lineWidth = isHovered ? 2.5 : 2;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // Texte ID
+        ctx.fillStyle = isDimmed ? "rgba(255,255,255,0.4)" : "#fff";
+        ctx.font = `bold ${r * 0.65}px 'Inter', sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(n.id.slice(0, 2), x, y);
+
+        // Label nom
+        ctx.fillStyle = isDimmed ? "rgba(255,255,255,0.3)" : "#fff";
+        ctx.font = `600 12px 'Inter', sans-serif`;
+        ctx.fillText(n.label, x, y + r + 14);
+
+        // Label type
+        ctx.fillStyle = isDimmed ? "rgba(150,150,150,0.3)" : color;
+        ctx.font = `500 10px 'Inter', sans-serif`;
+        ctx.fillText(n.type.charAt(0).toUpperCase() + n.type.slice(1), x, y + r + 28);
       });
+
       animId = requestAnimationFrame(draw);
     };
     draw();
-    return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("mouseleave", handleMouseLeave);
+    };
   }, []);
+
   return (
     <div style={{ width: "100%", maxWidth: "860px", margin: "0 auto" }}>
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", overflow: "hidden", padding: "16px" }}>
-        <canvas ref={canvasRef} style={{ width: "100%", height: "420px", display: "block" }} />
+      <div style={{
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "20px",
+        overflow: "hidden",
+        padding: "16px",
+      }}>
+        <canvas
+          ref={canvasRef}
+          style={{ width: "100%", height: "420px", display: "block", cursor: "crosshair" }}
+        />
         <div style={{ display: "flex", gap: "24px", padding: "12px 16px 4px" }}>
-          {[["#FF540B","Startup"],["#38bdf8","Talent"],["#34d399","Investisseur"]].map(([color, label]) => (
+          {[["#FF540B", "Startup"], ["#38bdf8", "Talent"], ["#34d399", "Investisseur"]].map(([color, label]) => (
             <div key={label} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: 10, height: 10, borderRadius: "50%", background: color, display: "inline-block" }} />
               <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)" }}>{label}</span>
@@ -141,9 +265,6 @@ function MatchingGraph() {
     </div>
   );
 }
-
-// ─── Feature Card ──────────────────────────────────────────────────────────────
-// Éclair avec cercle autour — comme dans le capture
 const IconEclair = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
@@ -151,7 +272,6 @@ const IconEclair = () => (
   </svg>
 );
 
-// Deux personnes avec + entre elles — matching
 const IconPersonnes = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="7" cy="7" r="3" />
@@ -163,7 +283,6 @@ const IconPersonnes = () => (
   </svg>
 );
 
-// Cible triple cercle avec point central — matching
 const IconCible = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
@@ -172,7 +291,6 @@ const IconCible = () => (
   </svg>
 );
 
-// Flèche tendance haussière — matching
 const IconGraphe = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF540B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 17 8 12 12 15 17 9 21 13" />
@@ -182,45 +300,76 @@ const IconGraphe = () => (
 );
 
 const FEATURES = [
-  { icon: <IconEclair />,   title: "Matching Intelligent",   desc: "Notre algorithme analyse 50+ critères pour des connexions ultra-pertinentes." },
+  { icon: <IconEclair />,    title: "Matching Intelligent",  desc: "Notre algorithme analyse 50+ critères pour des connexions ultra-pertinentes." },
   { icon: <IconPersonnes />, title: "Communauté Qualifiée",  desc: "Startups, talents et investisseurs vérifiés et engagés." },
-  { icon: <IconCible />,    title: "Précision Maximale",     desc: "Ciblage affiné pour des rencontres qui génèrent de la valeur." },
-  { icon: <IconGraphe />,   title: "Croissance Accélérée",   desc: "Accédez aux ressources et connexions pour scaler rapidement." },
+  { icon: <IconCible />,     title: "Précision Maximale",    desc: "Ciblage affiné pour des rencontres qui génèrent de la valeur." },
+  { icon: <IconGraphe />,    title: "Croissance Accélérée",  desc: "Accédez aux ressources et connexions pour scaler rapidement." },
 ];
 
 function FeatureCard({ icon, title, desc, index }) {
   return (
-    <div className="feature-card" style={{
-      background: "#ffffff",
-      borderRadius: "28px",
-      padding: "48px 36px",
-      display: "flex", flexDirection: "column", gap: "24px",
-      boxShadow: "0 8px 60px rgba(0,0,0,0.3)",
-      cursor: "default",
-      animation: `floatCard${index} ${3.5 + index * 0.4}s ease-in-out infinite`,
-      minHeight: "260px",
-    }}>
-      <div style={{ width: "64px", height: "64px", background: "rgba(249,115,22,0.12)", borderRadius: "18px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div
+      className="feature-card"
+      style={{
+        background: "#ffffff",
+        borderRadius: "20px",
+        padding: "28px 24px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "14px",
+        boxShadow: "0 4px 32px rgba(0,0,0,0.13)",
+        cursor: "default",
+        animation: `floatCard${index} ${3.5 + index * 0.4}s ease-in-out infinite`,
+        fontFamily: "'Inter', sans-serif",
+        border: "1px solid rgba(0,0,0,0.05)",
+      }}
+    >
+      <div style={{
+        width: "48px",
+        height: "48px",
+        background: "rgba(255, 84, 11, 0.10)",
+        borderRadius: "12px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}>
         {icon}
       </div>
-      <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#0f1624", lineHeight: 1.3 }}>{title}</h3>
-      <p style={{ fontSize: "0.95rem", color: "#64748b", lineHeight: 1.7 }}>{desc}</p>
+
+      <h3 style={{
+        fontSize: "1rem",
+        fontWeight: 700,
+        color: "#0f1624",
+        lineHeight: 1.3,
+        margin: 0,
+      }}>
+        {title}
+      </h3>
+
+      <p style={{
+        fontSize: "0.875rem",
+        color: "#94a3b8",
+        lineHeight: 1.65,
+        margin: 0,
+      }}>
+        {desc}
+      </p>
     </div>
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function HeroPage() {
   return (
     <div style={{
       background: "linear-gradient(160deg, #20222C , #20222C 40%, #20222C 100%)",
-      fontFamily: "'Sora', sans-serif",
+      fontFamily: "'Inter', sans-serif",
       color: "#fff",
       overflowX: "hidden",
       position: "relative",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         @keyframes fadeUp {
@@ -276,12 +425,29 @@ export default function HeroPage() {
         }
         @media (max-width: 1000px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 500px)  { .cards-grid { grid-template-columns: 1fr; } }
+
+        @keyframes shine {
+          0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 84, 11, 0.5), 0 0 20px rgba(255, 84, 11, 0.3); }
+          50% { opacity: 0.9; text-shadow: 0 0 15px rgba(255, 84, 11, 0.8), 0 0 30px rgba(255, 84, 11, 0.5); }
+        }
+
+        .text-shiny {
+          color: #FF540B;
+          background: linear-gradient(135deg, #FF540B 0%, #ff8c5a 50%, #FF540B 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-size: 200% auto;
+          animation: shine 3s ease-in-out infinite, moveGradient 5s linear infinite;
+        }
+
+        @keyframes moveGradient {
+          to { background-position: 200% center; }
+        }
       `}</style>
 
-      {/* ★ Étoiles sur TOUT le fond (position: fixed) */}
       <StarCanvas />
 
-      {/* ══════════ SECTION 1 — HERO ══════════ */}
+      {/* SECTION 1 — HERO */}
       <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <div className="hero-glow" />
         <main style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 24px 40px", position: "relative", zIndex: 2 }}>
@@ -294,7 +460,7 @@ export default function HeroPage() {
           <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: "8px", color: "#fff" }}>
             Connectez-vous
           </h1>
-          <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", color: "#FF540B", marginBottom: "32px" }}>
+          <h1 className="fade-up-2 text-shiny" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: "32px" }}>
             à votre succès
           </h1>
 
@@ -303,15 +469,15 @@ export default function HeroPage() {
           </p>
 
           <div className="fade-up-4" style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center", marginBottom: "80px" }}>
-            <button className="btn-primary" style={{ background: "#FF540B", color: "#fff", border: "none", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 700, fontFamily: "inherit", display: "flex", alignItems: "center", gap: "8px" }}>
+            <button className="btn-primary" style={{ background: "#FF540B", color: "#fff", border: "none", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 700, fontFamily: "'Inter', sans-serif", display: "flex", alignItems: "center", gap: "8px" }}>
               Trouver mon match <span>→</span>
             </button>
-            <button className="btn-outline" style={{ background: "transparent", color: "#FF540B", border: "2px solid #FF540B", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 600, fontFamily: "inherit" }}>
+            <button className="btn-outline" style={{ background: "transparent", color: "#FF540B", border: "2px solid #FF540B", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
               Découvrir la plateforme
             </button>
           </div>
 
-          <div className="fade-up-5" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "clamp(24px, 6vw, 80px)", width: "100%", maxWidth: "780px" }}>
+          <div className="fade-up-5" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "clamp(24px, 6vw, 80px)", width: "100%", maxWidth: "px" }}>
             <Stat value="2,500+" label="Projets connectés" />
             <Stat value="850+"   label="Investisseurs actifs" />
             <Stat value="95%"    label="Taux de satisfaction" />
@@ -324,13 +490,13 @@ export default function HeroPage() {
         </main>
       </section>
 
-      {/* ══════════ SECTION 2 — MATCHING GRAPH ══════════ */}
+      {/* SECTION 2 — MATCHING GRAPH */}
       <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "100px 24px", position: "relative" }}>
         <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: "600px", height: "300px", background: "radial-gradient(ellipse, rgba(56,189,248,0.08) 0%, transparent 70%)", pointerEvents: "none", zIndex: 1 }} />
 
         <div className="fade-up-6" style={{ textAlign: "center", marginBottom: "60px", position: "relative", zIndex: 2 }}>
           <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
-            Matching en <span style={{ color: "#FF540B" }}>temps réel</span>
+            Matching en <span className="text-shiny">temps réel</span>
           </h2>
           <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(127,131,147,1)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
             Visualisez les connexions qui se créent entre startups, talents et investisseurs.
@@ -342,26 +508,69 @@ export default function HeroPage() {
         </div>
       </section>
 
-      {/* ══════════ SECTION 3 — POURQUOI MATCHHUB ══════════ */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "120px 48px", position: "relative" }}>
-        <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: "radial-gradient(ellipse, #20222C,80%)", pointerEvents: "none", zIndex: 1 }} />
+      {/* SECTION 3 — POURQUOI MATCHHUB */}
+{/* SECTION 3 — POURQUOI MATCHHUB */}
+<section style={{
+  minHeight: "100vh",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "120px 32px 80px",
+  position: "relative",
+}}>
+  <div style={{
+    position: "absolute",
+    top: "40%", left: "50%",
+    transform: "translate(-50%,-50%)",
+    width: "800px", height: "400px",
+    background: "radial-gradient(ellipse, rgba(255,84,11,0.06) 0%, transparent 70%)",
+    pointerEvents: "none", zIndex: 1,
+  }} />
 
-        <div className="fade-up-8" style={{ textAlign: "center", marginBottom: "64px", position: "relative", zIndex: 2 }}>
-          <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "16px", color: "#fff" }}>
-            Pourquoi <span style={{ color: "#FF540B" }}>MatchHub</span> ?
-          </h2>
-          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "rgba(127,131,147,1)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
-            Une technologie de pointe au service de connexions significatives.
-          </p>
-        </div>
+  <div className="fade-up-8" style={{
+    textAlign: "center",
+    marginBottom: "72px",
+    position: "relative", zIndex: 2,
+    width: "100%",
+  }}>
+    <h2 style={{
+      fontSize: "clamp(2rem, 5vw, 3.5rem)",
+      fontWeight: 800,
+      letterSpacing: "-0.03em",
+      marginBottom: "16px",
+      color: "#fff",
+    }}>
+      Pourquoi <span className="text-shiny">MatchHub</span> ?
+    </h2>
+    <p style={{
+      fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+      color: "rgba(127,131,147,1)",
+      maxWidth: "520px",
+      margin: "0 auto",
+      lineHeight: 1.7,
+    }}>
+      Une technologie de pointe au service de connexions significatives.
+    </p>
+  </div>
 
-        <div className="fade-up-9 cards-grid" style={{ position: "relative", zIndex: 2 }}>
-          {FEATURES.map((f, i) => (
-            <FeatureCard key={f.title} {...f} index={i} />
-          ))}
-        </div>
-      </section>
-
+  {/* Cards — pleine largeur */}
+  <div className="fade-up-9" style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: "20px",
+    width: "100%",
+    maxWidth: "100%",       
+    padding: "0",           
+    position: "relative",
+    zIndex: 2,
+    alignItems: "end",
+  }}>
+    {FEATURES.map((f, i) => (
+      <FeatureCard key={f.title} {...f} index={i} />
+    ))}
+  </div>
+</section>
     </div>
   );
 }
