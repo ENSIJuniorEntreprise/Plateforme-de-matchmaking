@@ -28,7 +28,7 @@ function ProgressBar({ step }) {
   );
 }
 
-function SignUp() {
+function FormWizard() {
   const [step, setStep] = useState(1);
 
   const [form, setform] = useState({
@@ -49,7 +49,7 @@ function SignUp() {
 
   return (
     <div className="bg-[#20222C] w-screen min-h-screen flex flex-col items-center p-6">
-      <div className="w-[900px] ">
+      <div className="w-full max-w-[850px] px-4">
         <ProgressBar step={step} />
         {step === 1 && <Choose form={form} setform={setform} nextStep={nextStep} />}
         {step === 2 && <Formulaire form={form} setform={setform} nextStep={nextStep} prevStep={prevStep} />}
@@ -59,4 +59,4 @@ function SignUp() {
     </div>
   );
 }
-export default SignUp;
+export default FormWizard;

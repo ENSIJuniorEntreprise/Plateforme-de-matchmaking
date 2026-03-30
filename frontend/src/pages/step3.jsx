@@ -9,58 +9,60 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
   };
 
   return (
-    
-        <div className="bg-[#222834] p-8 rounded-3xl w-[700px] border border-[#FF6611] ml-30">
+    <div className="bg-[#222834] p-4 md:p-8 rounded-3xl mt-6 md:mt-15 w-full border border-[#FF6611]">
       <form onSubmit={handleSubmit}>
-        <h1 className="text-3xl font-bold mb-2 text-white ">Votre organisation</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-white">Votre organisation</h1>
         <h4 className="mb-6 text-[#94A3B8] text-sm">Parlez-nous de votre entreprise ou projet</h4>
 
-        <div className="">
-          <label htmlFor="Entreprise" className="text-white">Entreprise actuelle</label><br /><input
+        <div className="mb-4">
+          <label className="text-white">Entreprise actuelle</label>
+          <input
             type="text"
             name="Entreprise"
             placeholder="Ma super startup"
             required
             value={form.Entreprise}
             onChange={setvalues}
-            className="p-3 rounded-xl mb-3 mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white w-[350px]"
+            className="w-full p-3 rounded-xl mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="Localisation" className="text-white">Localisation</label><br /><input
+        <div className="mb-4">
+          <label className="text-white">Localisation</label>
+          <input
             type="text"
             name="Localisation"
             placeholder="Tunis, Tunisie"
             required
             value={form.Localisation}
             onChange={setvalues}
-            className="p-3 rounded-xl mb-1 mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white w-[350px]"
+            className="w-full p-3 rounded-xl mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
           />
         </div>
 
-        <div className="">
-          <label htmlFor="Lien" className="text-white">Lien site web ou LinkedIn</label><br />
+        <div className="mb-4">
+          <label className="text-white">Lien site web ou LinkedIn</label>
           <input
-            type="text"
+            type="url"
             name="Lien"
             placeholder="www.mystartup.com"
             required
             value={form.Lien}
             onChange={setvalues}
-            className="w-[450px] mb-3 mt-1 p-3 rounded-xl placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
+            className="w-full p-3 rounded-xl mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
           />
         </div>
 
-        <div className="">
-          <label htmlFor="Description" className="text-white">Description</label><br /><input
-            type="text"
+        <div className="mb-8">
+          <label className="text-white">Description</label>
+          <textarea
             name="Description"
             placeholder="Décrivez brièvement votre activité"
             required
             value={form.Description}
             onChange={setvalues}
-            className="w-[450px] mb-8 mt-1 h-[100px] pb-13 pl-3 rounded-xl placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white "
+            rows={4}
+            className="w-full p-3 rounded-xl mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white resize-none"
           />
         </div>
 
@@ -68,23 +70,19 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
           <button
             type="button"
             onClick={prevStep}
-            className="text-white px-6 py-2 rounded-[10px] border border-orange-500 hover:bg-orange-500 transition w-[125px]"
+            className="text-white px-6 py-2 rounded-[10px] border border-orange-500 hover:bg-orange-500 hover:scale-105 cursor-pointer transition"
           >
             ← Retour
           </button>
-
           <button
             type="submit"
-            className="bg-orange-500 text-white px-6 py-2 rounded-[10px] "
+            className="bg-orange-500 text-white px-6 py-2 rounded-[10px] hover:scale-105 cursor-pointer transition"
           >
             Continuer →
           </button>
         </div>
       </form>
     </div>
-
-  
-    
   );
 }
 
