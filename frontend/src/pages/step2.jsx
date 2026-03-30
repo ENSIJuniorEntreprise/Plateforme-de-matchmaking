@@ -1,4 +1,4 @@
-function Formulaire({ form, setform, nextStep,prevStep }) {
+function Formulaire({ form, setform, nextStep ,prevStep}) {
   const setvalues = (e) => {
     setform({ ...form, [e.target.name]: e.target.value });
   };

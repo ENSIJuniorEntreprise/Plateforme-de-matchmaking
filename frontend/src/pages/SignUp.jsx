@@ -32,7 +32,7 @@ function SignUp() {
   const [step, setStep] = useState(1);
 
   const [form, setform] = useState({
-    role:"",
+    role :"",
     Prenom: "",
     Nom: "",
     Email: "",
@@ -51,7 +51,7 @@ function SignUp() {
     <div className="bg-[#20222C] w-screen min-h-screen flex flex-col items-center p-6">
       <div className="w-[900px] ">
         <ProgressBar step={step} />
-        {step === 1 && < Choose form={form} setform={setform} nextStep={nextStep} />}
+        {step === 1 && <Choose form={form} setform={setform} nextStep={nextStep} />}
         {step === 2 && <Formulaire form={form} setform={setform} nextStep={nextStep} prevStep={prevStep} />}
         {step === 3 && <Formulaire2 form={form} setform={setform} prevStep={prevStep} nextStep={nextStep}/>}
         {step === 4 && <Update form={form} setform={setform} prevStep={prevStep} />}
