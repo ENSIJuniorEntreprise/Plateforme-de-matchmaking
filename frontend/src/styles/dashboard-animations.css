@@ -1,0 +1,145 @@
+/* Dashboard Hover Animations - Complements Tailwind CSS */
+
+/* Stat Cards Float Animations */
+@keyframes float-stat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+.animate-float-1 {
+  animation: float-stat 2.8s ease-in-out infinite !important;
+}
+
+.animate-float-2 {
+  animation: float-stat 3.2s ease-in-out infinite 0.4s !important;
+}
+
+.animate-float-3 {
+  animation: float-stat 3.5s ease-in-out infinite 0.8s !important;
+}
+
+.animate-float-4 {
+  animation: float-stat 4s ease-in-out infinite 1.2s !important;
+}
+
+/* Main Card Animations - Always Running */
+.animate-matches-float {
+  animation: matches-float 8s ease-in-out infinite !important;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="%23FF540B"/></svg>') 10 10, auto;
+}
+
+.animate-notifications-rotate {
+  animation: notifications-rotate 7s ease-in-out infinite !important;
+}
+
+.animate-cta-bounce {
+  animation: cta-bounce 6.5s ease-in-out infinite !important;
+}
+
+/* Matches Card Hover Animation */
+.animate-matches-float:hover {
+  animation: matches-float-hover 8s ease-in-out infinite !important;
+  box-shadow: 0 0 30px rgba(255, 84, 11, 0.4) !important;
+  z-index: 10;
+}
+
+/* Notifications Card Hover Animation */
+.animate-notifications-rotate:hover {
+  animation: notifications-rotate-hover 7s ease-in-out infinite !important;
+  box-shadow: 0 0 30px rgba(255, 84, 11, 0.4) !important;
+  z-index: 10;
+}
+
+/* CTA Card Hover Animation */
+.animate-cta-bounce:hover {
+  animation: cta-bounce-hover 6.5s ease-in-out infinite !important;
+  box-shadow: 0 0 30px rgba(255, 84, 11, 0.4) !important;
+  z-index: 10;
+}
+
+/* Keyframes for Normal States */
+@keyframes matches-float {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(8px) translateY(-5px); }
+  50% { transform: translateX(0) translateY(-10px); }
+  75% { transform: translateX(-8px) translateY(-5px); }
+}
+
+@keyframes notifications-rotate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.03) rotate(2deg); }
+}
+
+@keyframes cta-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-2px) scale(1.025); }
+}
+
+/* Keyframes for Hover States */
+@keyframes matches-float-hover {
+  0%, 100% { transform: translateX(0) translateY(0) scale(1.08); }
+  25% { transform: translateX(8px) translateY(-5px) scale(1.08); }
+  50% { transform: translateX(0) translateY(-10px) scale(1.08); }
+  75% { transform: translateX(-8px) translateY(-5px) scale(1.08); }
+}
+
+@keyframes notifications-rotate-hover {
+  0%, 100% { transform: scale(1.08) rotate(0deg); }
+  50% { transform: scale(1.11) rotate(2deg); }
+}
+
+@keyframes cta-bounce-hover {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-2px) scale(1.05); }
+}
+
+/* Stat Shadow Glow Animation */
+@keyframes stat-shadow-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,84,11,0.1); }
+  50% { box-shadow: 0 0 30px rgba(255,84,11,0.4); }
+}
+
+/* Matches Container Hover Effect */
+.matches-container:hover .match-row:not(:hover) {
+  opacity: 0.6;
+  filter: grayscale(0.2);
+  transform: scale(0.98);
+}
+
+/* Stat Card Hover Glow + Turn icons orange */
+.stat-card:hover {
+  animation: stat-shadow-glow 3s ease-in-out infinite !important;
+}
+
+/* Force all stat card icons to orange on hover - covering all colors */
+.stat-card:hover .text-\[\#f59e0b\] {
+  color: #FF540B !important;
+}
+
+.stat-card:hover .text-\[\#3b82f6\] {
+  color: #FF540B !important;
+}
+
+.stat-card:hover .text-\[\#10b981\] {
+  color: #FF540B !important;
+}
+
+.stat-card:hover .text-\[\#FF540B\] {
+  color: #FF540B !important;
+}
+
+.stat-card:hover .bg-\[rgba\(245\,158\,11\,0\.12\)\] {
+  background-color: rgba(255, 84, 11, 0.12) !important;
+}
+
+.stat-card:hover .bg-\[rgba\(59\,130\,246\,0\.12\)\] {
+  background-color: rgba(255, 84, 11, 0.12) !important;
+}
+
+.stat-card:hover .bg-\[rgba\(16\,185\,129\,0\.12\)\] {
+  background-color: rgba(255, 84, 11, 0.12) !important;
+}
+
+.stat-card:hover .bg-\[rgba\(255\,84\,11\,0\.12\)\] {
+  background-color: rgba(255, 84, 11, 0.12) !important;
+}

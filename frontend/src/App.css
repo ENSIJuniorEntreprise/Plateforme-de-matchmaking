@@ -1,15 +1,4 @@
-/* App styles */
-.app-root {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+/* App styles are now 100% Tailwind CSS */
+/* See App.jsx for className definitions */
 
-.app-root main {
-  flex: 1;
-  width: 100%;
-  padding-top: 0;
-}
  

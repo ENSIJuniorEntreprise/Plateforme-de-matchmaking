@@ -10,22 +10,29 @@ import Dashboard from './pages/Dashboard'
 
 function App() {
   const [route, setRoute] = useState('accueil')
+  // Global auth state shared across all components
+  const [user, setUser] = useState(null) // null = logged out, { name: 'John Doe' } = logged in
+
+  const handleLogin = (userData) => {
+    setUser(userData || { name: 'John Doe' })
+    setRoute('accueil')
+  }
 
   const renderPage = () => {
     switch (route) {
       case 'matchmaking':
         return <Matchmaking onNavigate={setRoute} />
       case 'signin':
-        return <SignIn onNavigate={setRoute} /> 
+        return <SignIn onNavigate={setRoute} onLogin={handleLogin} />
       case 'signup':
-        return <SignUp onNavigate={setRoute} />
+        return <SignUp onNavigate={setRoute} onLogin={handleLogin} user={user} />
       case 'profile':
         return <Profile onNavigate={setRoute} />
       case 'dashboard':
         return <Dashboard onNavigate={setRoute} />
       case 'accueil':
       default:
-        return <Accueil onNavigate={setRoute} />
+        return <Accueil onNavigate={setRoute} user={user} />
     }
   }
 
@@ -35,6 +42,7 @@ function App() {
         currentPage={route}
         onNavigate={setRoute}
         hideNav={!['accueil', 'matchmaking', 'dashboard'].includes(route)}
+        user={user}
       />
       <main className="w-full flex-1 p-0">
         {renderPage()}
