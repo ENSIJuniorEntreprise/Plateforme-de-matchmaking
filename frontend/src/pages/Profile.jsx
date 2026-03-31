@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 /* ── Data ───────────────────────────────────────────────── */
 const DATA = {
   name: "TechFlow AI",
@@ -52,7 +51,7 @@ const Ico = ({ n, s = 14, c = "currentColor" }) => (
 );
 
 /* ── Circular Match Score ───────────────────────────────── */
-function MatchScore({ score }) {
+function MatchScore({ score , onNavigate }) {
   const [prog, setProg] = useState(0);
   const R = 38, C = 2 * Math.PI * R;
   useEffect(() => {
@@ -83,7 +82,7 @@ function MatchScore({ score }) {
         </div>
       </div>
       <button
-        onClick={() => { window.location.href = "/Matchmaking.jsx"; }}
+        onClick={() => onNavigate("matchmaking")}
         className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-orange-500/30 hover:scale-[1.02]"
       >
         <Ico n="bolt" s={14} c="#fff" /> Match
@@ -198,7 +197,7 @@ function TimelineItem({ date, title, desc, isLast, idx, run }) {
 /* ── Main Page ──────────────────────────────────────────── */
 const TABS = ["A propos", "Competence", "Parcours"];
 
-export default function ProfilePage() {
+export default function ProfilePage({ onNavigate }) {
   const [tab, setTab]       = useState(0);
   const [animKey, setAnimKey] = useState(0);
   const [out, setOut]       = useState(false);
@@ -337,7 +336,8 @@ export default function ProfilePage() {
         {/* Facebook */}
         <a href="https://www.facebook.com/login" target="_blank" rel="noreferrer"
           className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200"
+  style={{ background: "#11141d", border: "2px solid #f97316" }}>
 
             <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
               <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
@@ -349,8 +349,7 @@ export default function ProfilePage() {
         {/* Instagram */}
         <a href="https://www.instagram.com/accounts/login" target="_blank" rel="noreferrer"
           className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200"
-            style={{ background: "linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)" }}>
+          <div className="w-14 h-14 rounded-2xl bg-[#11141d] border-2 border-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
               <circle cx="12" cy="12" r="4"/>
@@ -363,7 +362,8 @@ export default function ProfilePage() {
         {/* LinkedIn */}
         <a href="https://www.linkedin.com/login" target="_blank" rel="noreferrer"
           className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl bg-[#0A66C2] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+          <div className="w-14 h-14 rounded-2xl bg-[#11141d] border-2 border-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+
             <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
               <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
               <circle cx="4" cy="4" r="2"/>
@@ -500,7 +500,7 @@ export default function ProfilePage() {
 
           {/* Right sidebar */}
           <div className="w-full lg:w-52 lg:shrink-0">
-            <MatchScore score={DATA.matchScore} />
+            <MatchScore score={DATA.matchScore} onNavigate={onNavigate} />  
             <Accomplishments items={DATA.accomplishments} />
           </div>
 
