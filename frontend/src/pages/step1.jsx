@@ -75,7 +75,7 @@ export default function Choose({ nextStep, form, setform }) {
                   </svg>
                 )}
               </div>
-              <img src={option.img} className="w-16 h-16 md:w-22 md:h-22 object-contain mb-3 mt-2" />
+              <img src={option.img} className="w-16 h-16 md:w-20 md:h-20 object-contain mb-3 mt-2" />
               <h3 className={`font-bold text-sm mb-1 ${isSelected ? "text-black" : "text-white"}`}>
                 {option.label}
               </h3>
