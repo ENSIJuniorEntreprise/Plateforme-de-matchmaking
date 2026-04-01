@@ -11,7 +11,7 @@ export default function Footer({ onNavigate }) {
     <footer className="font-inter w-full border-t border-[#2a2d35] bg-[#20222C]">
 
       {/* ── Main grid ── */}
-      <div className="grid w-full grid-cols-1 items-start gap-[32px] px-[clamp(1rem,3vw,40px)] pb-[32px] pt-[48px] sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_auto]">
+      <div className="grid w-full grid-cols-1 items-start gap-[32px] px-[clamp(1rem,3vw,40px)] pb-[32px] pt-[48px] lg:grid-cols-[2fr_1fr_1fr_1fr_auto]">
 
         {/* ── Logo + description + contacts ── */}
         <div className="flex max-w-[300px] flex-col justify-self-start">
@@ -89,11 +89,11 @@ export default function Footer({ onNavigate }) {
         </div>
 
         {/* ── Suivez-nous ── */}
-        <div className="flex flex-col items-center sm:items-end lg:items-end lg:justify-self-end">
+        <div className="flex flex-col items-start sm:items-start lg:items-end lg:justify-self-end">
           {/* Spacer to push down to align with the social icons area on lg */}
           <div className="hidden lg:block lg:mt-[196px]" />
           {/* "Suivez-nous" perfectly centered over the icons row */}
-          <div className="flex flex-col items-center gap-[14px]">
+          <div className="flex flex-col items-start gap-[14px] lg:items-center">
             <p className="text-[18px] font-semibold text-[#7F8393]">Suivez-nous</p>
             <div className="flex items-center gap-[8px]">
               {/* Facebook */}

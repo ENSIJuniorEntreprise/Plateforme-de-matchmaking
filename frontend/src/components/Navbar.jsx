@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Sparkles, User, ChevronRight } from "lucide-react";
 
 // ─── Variant config ───────────────────────────────────────────────────────────
@@ -9,14 +9,14 @@ const DEFAULT_PAGES   = ["accueil", "matchmaking", "dashboard"];
 
 const NAVBAR_VARIANTS = {
   default: {
-    headerClass:       "h-[102px]",
+    headerClass:         "h-[102px]",
     innerMarginTopClass: "mt-[25px]",
-    spacerClass:       "h-[102px]",
+    spacerClass:         "h-[102px]",
   },
   auth: {
-    headerClass:       "h-[90px]",
+    headerClass:         "h-[90px]",
     innerMarginTopClass: "mt-[1px]",
-    spacerClass:       "h-[90px]",
+    spacerClass:         "h-[90px]",
   },
 };
 
@@ -26,13 +26,6 @@ function getVariant(page) {
   return "default";
 }
 
-/**
- * Which buttons to show on the right.
- * - When user is logged in: show profile name + "Visiter mon profil" button
- * - signin page  → only "Commencer"
- * - signup page  → only "Connexion"
- * - others       → both (or profile if logged in)
- */
 function getRightButtons(page) {
   if (page === "signin")               return { showConnexion: false, showCommencer: true  };
   if (page === "signup")               return { showConnexion: true,  showCommencer: false };
@@ -69,12 +62,38 @@ const navItems = [
 
 export default function Navbar({ currentPage, onNavigate, hideNav, variant, user }) {
   useIonicons();
-  const [active, setActive]           = useState(currentPage || "accueil");
-  const [mobileOpen, setMobileOpen]   = useState(false);
+  const [active, setActive]               = useState(currentPage || "accueil");
+  const [mobileOpen, setMobileOpen]       = useState(false);
+  const [indicatorLeft, setIndicatorLeft] = useState(null);
+
+  const ulRef       = useRef(null);
+  const itemRefs    = useRef([]);
 
   useEffect(() => {
     if (currentPage) setActive(currentPage);
   }, [currentPage]);
+
+  // Measure actual DOM position of the active item and center the indicator on it
+  useEffect(() => {
+    const update = () => {
+      const activeIdx = navItems.findIndex((item) => item.id === active);
+      if (activeIdx < 0) return;
+      const ul   = ulRef.current;
+      const item = itemRefs.current[activeIdx];
+      if (!ul || !item) return;
+
+      const ulRect   = ul.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
+      // Center of item relative to ul, minus half indicator width (30px)
+      const left = (itemRect.left - ulRect.left) + (itemRect.width / 2) - 30;
+      setIndicatorLeft(left);
+    };
+
+    // Run immediately + on every resize/zoom change
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [active]);
 
   const handleNav = (id) => {
     setMobileOpen(false);
@@ -100,24 +119,16 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
     }
   };
 
-  const activeIndex       = navItems.findIndex((item) => item.id === active);
-  const resolvedVariant   = variant ?? getVariant(currentPage);
+  const activeIndex     = navItems.findIndex((item) => item.id === active);
+  const resolvedVariant = variant ?? getVariant(currentPage);
   const { headerClass, innerMarginTopClass, spacerClass } = NAVBAR_VARIANTS[resolvedVariant];
   const { showConnexion, showCommencer } = getRightButtons(active);
-  const isSingleAuthButton = active === "signin" || active === "signup";
-  const isAuthOrDash       = AUTH_PAGES.includes(active) || DASHBOARD_PAGES.includes(active);
-  const showNavPill        = !hideNav && !isAuthOrDash;
+  const isAuthOrDash = AUTH_PAGES.includes(active) || DASHBOARD_PAGES.includes(active);
+  const showNavPill  = !hideNav && !isAuthOrDash;
 
-  // Toujours 3 colonnes quand la nav pill est affichée pour garder le centrage parfait
   const gridClass = showNavPill
-    ? "grid-cols-[1fr_auto_1fr]"
-    : "grid-cols-[auto_1fr]";
-
-  const indicatorTranslate =
-    activeIndex === 0 ? "translate-x-[20px]"  :
-    activeIndex === 1 ? "translate-x-[120px]" :
-    activeIndex === 2 ? "translate-x-[220px]" :
-    "translate-x-0";
+  ? "grid-cols-[auto_1fr_auto]"
+  : "grid-cols-[auto_1fr]";
 
   return (
     <>
@@ -136,14 +147,21 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
 
           {/* ── Nav pill — desktop, centered ── */}
           {showNavPill && (
-            <nav className="hidden justify-self-center md:flex">
-              <div className="relative flex h-[50px] w-[300px] items-center justify-center rounded-[10px] bg-[#3F3F3F] xl:w-[320px]">
-                <ul className="relative m-0 flex w-[280px] list-none p-0 xl:w-[300px]">
-                  {navItems.map((item) => {
+                <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2">              <div
+                className="relative flex h-[50px] w-[300px] items-center justify-center rounded-[10px] bg-[#3F3F3F] xl:w-[320px]"
+                style={{ overflow: "visible" }}
+              >
+                <ul
+                  ref={ulRef}
+                  className="relative m-0 flex w-[280px] list-none p-0 xl:w-[300px]"
+                  style={{ overflow: "visible" }}
+                >
+                  {navItems.map((item, idx) => {
                     const isActive = active === item.id;
                     return (
                       <li
                         key={item.id}
+                        ref={(el) => (itemRefs.current[idx] = el)}
                         onClick={() => handleNav(item.id)}
                         className="group relative z-[1] h-[70px] w-[93px] cursor-pointer xl:w-[100px]"
                       >
@@ -152,14 +170,20 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
                           onClick={(e) => e.preventDefault()}
                           className="font-inter relative flex h-full w-full flex-col items-center justify-center text-center font-medium no-underline"
                         >
-                          <span className={`mb-[10px] block text-center text-[1.5em] leading-[60px] text-[#3F3F3F] transition duration-500 ${isActive ? "-translate-y-[32px]" : "translate-y-0"}`}>
+                          <span
+                            className={`mb-[10px] block text-center text-[1.5em] leading-[60px] text-[#3F3F3F] transition duration-500 ${
+                              isActive ? "-translate-y-[32px]" : "translate-y-0"
+                            }`}
+                          >
                             <ion-icon name={item.icon} />
                           </span>
-                          <span className={`font-inter absolute bottom-[22px] text-[0.7rem] font-[550] tracking-[0.05rem] opacity-100 transition-all duration-300 ease-out xl:text-[0.725rem] translate-y-[-3px] ${
-                            isActive
-                              ? "text-[#FF540B]"
-                              : "text-white group-hover:-translate-y-1 group-hover:scale-105 group-hover:text-[#FF540B]"
-                          }`}>
+                          <span
+                            className={`font-inter absolute bottom-[22px] text-[0.7rem] font-[550] tracking-[0.05rem] opacity-100 transition-all duration-300 ease-out xl:text-[0.725rem] translate-y-[-3px] ${
+                              isActive
+                                ? "text-[#FF540B]"
+                                : "text-white group-hover:-translate-y-1 group-hover:scale-105 group-hover:text-[#FF540B]"
+                            }`}
+                          >
                             {item.name}
                           </span>
                         </a>
@@ -167,8 +191,23 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
                     );
                   })}
 
+                  {/* Indicator bubble — always perfectly centered over active item */}
                   <div
-                    className={`before:content-[''] after:content-[''] absolute top-[-50%] h-[60px] w-[60px] rounded-full border-[6px] border-[#20222C] bg-[#FF540B] transition-transform duration-500 before:absolute before:left-[-11px] before:top-[77%] before:h-[18px] before:w-[17px] before:rotate-[-10deg] before:rounded-tr-[30px] before:bg-transparent before:shadow-[1px_-8px_0_0_#20222C] after:absolute after:right-[-13px] after:top-[76.2%] after:h-[19px] after:w-[18px] after:rotate-[15deg] after:rounded-tl-[30px] after:bg-transparent after:shadow-[-1px_-8px_0_0_#20222C] ${indicatorTranslate} ${activeIndex >= 0 ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+                    style={{
+                      position:        "absolute",
+                      top:             "-50%",
+                      left:            indicatorLeft !== null ? `${indicatorLeft}px` : "-999px",
+                      width:           "60px",
+                      height:          "60px",
+                      borderRadius:    "50%",
+                      border:          "6px solid #20222C",
+                      backgroundColor: "#FF540B",
+                      transition:      "left 0.5s cubic-bezier(0.23, 1, 0.32, 1)",
+                      opacity:          activeIndex >= 0 ? 1 : 0,
+                      pointerEvents:   "none",
+                      zIndex:          0,
+                    }}
+                    className="before:content-[''] after:content-[''] before:absolute before:left-[-11px] before:top-[77%] before:h-[18px] before:w-[17px] before:rotate-[-10deg] before:rounded-tr-[30px] before:bg-transparent before:shadow-[1px_-8px_0_0_#20222C] after:absolute after:right-[-13px] after:top-[76.2%] after:h-[19px] after:w-[18px] after:rotate-[15deg] after:rounded-tl-[30px] after:bg-transparent after:shadow-[-1px_-8px_0_0_#20222C]"
                   />
                 </ul>
               </div>
@@ -176,9 +215,7 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
           )}
 
           {/* ── Right area ── */}
-          <div className="flex items-center justify-self-end gap-[12px] sm:gap-[20px]">
-
-            {/* Logged-in state: profile name + visit button (hidden on profile page) */}
+          <div className="flex items-center justify-self-end gap-[20px]">
             {user && currentPage !== "profile" ? (
               <div className="flex items-center gap-[10px]">
                 <div className="hidden items-center gap-[8px] sm:flex">
@@ -212,13 +249,12 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
                   >
                     <Sparkles strokeWidth={2} className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span className="hidden sm:inline">Commencer</span>
-                    <span className="sm:hidden">Start</span>
+                    <span className="sm:hidden">Commencer</span>
                   </button>
                 )}
               </>
             )}
 
-            {/* ── Mobile hamburger (only when nav pill is shown) ── */}
             {showNavPill && (
               <button
                 className="flex h-[36px] w-[36px] cursor-pointer flex-col items-center justify-center gap-[5px] rounded-[8px] border border-[#3a3d52] bg-transparent transition-colors duration-200 hover:bg-[#2a2d3e] md:hidden"

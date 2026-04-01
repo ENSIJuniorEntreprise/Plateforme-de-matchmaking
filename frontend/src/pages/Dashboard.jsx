@@ -67,7 +67,7 @@ function StatCard({ stat }) {
   
   return (
     <div
-      className={`stat-card group relative flex min-w-0 flex-1 basis-[calc(50%-8px)] flex-col gap-[12px] overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.04)] px-[20px] py-[20px] transition-[border-color,box-shadow,transform] duration-300 ease-out ${animationMap[stat.animClass]} hover:scale-[1.04] hover:border-[rgba(255,255,255,0.22)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:animate-stat-shadow-glow sm:basis-[calc(50%-8px)] lg:basis-0`}
+      className={`stat-card group relative flex min-w-0 w-full flex-col gap-[12px] overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.04)] px-[20px] py-[20px] transition-[border-color,box-shadow,transform] duration-300 ease-out ${animationMap[stat.animClass]} hover:scale-[1.04] hover:border-[rgba(255,255,255,0.22)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:animate-stat-shadow-glow sm:flex-1 sm:basis-[calc(50%-8px)] lg:basis-0`}
     >
       <div className={`pointer-events-none absolute right-[-20px] top-[-20px] h-[80px] w-[80px] rounded-full opacity-15 blur-[35px] ${stat.glowClass}`} />
       <div className="flex items-start justify-between">
@@ -138,7 +138,7 @@ export default function Dashboard({ onNavigate }) {
         </div>
 
         {/* ── Matches + Notifications ── */}
-        <div className="mb-[40px] grid grid-cols-1 items-start gap-[32px] lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_360px]">
+        <div className="mb-[40px] grid grid-cols-1 items-start gap-[32px] lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_360px]">
 
           {/* Matchs récents */}
           <div className="animate-matches-float relative z-1 rounded-[20px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-[20px] sm:p-[28px] backdrop-blur-md transition-[box-shadow,transform] duration-300 hover:shadow-[0_0_30px_rgba(255,84,11,0.4)] hover:z-10" style={{ animationDelay: '0s', cursor: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22><circle cx=%2210%22 cy=%2210%22 r=%228%22 fill=%22%23FF540B%22/></svg>") 10 10, auto' }}>

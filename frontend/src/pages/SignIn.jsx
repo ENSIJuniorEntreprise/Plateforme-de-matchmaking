@@ -229,9 +229,10 @@ export default function ConnexionPage({ onNavigate, onLogin }) {
           </a>
         </div>
 
-        {/* ── reCAPTCHA ── */}
-        <div className="mb-[10px] scale-[90.2%] origin-top-left">
+        <div className="mb-[10px] w-full overflow-x-auto">
+          <div className="scale-[90.2%] origin-top-left">
           <ReCaptcha checked={captchaChecked} onChange={setCaptchaChecked} />
+          </div>
         </div>
 
         {/* ── Submit button ── */}
