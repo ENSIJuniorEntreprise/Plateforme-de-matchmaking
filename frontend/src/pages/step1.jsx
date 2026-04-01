@@ -61,7 +61,7 @@ export default function Choose({ nextStep, form, setform }) {
             <button
               key={option.id}
               onClick={() => handleSelect(option.id)}
-              className={`relative flex flex-col items-center text-center p-4 rounded-3xl border-2 cursor-pointer transition-all duration-200
+              className={`relative flex flex-col items-center text-center p-4 rounded-3xl border-2 cursor-pointer transition-all duration-200 hover:scale-105 cursor-pointer transition
                 ${isSelected
                   ? `${option.borderColor} ${option.bgColor} scale-105`
                   : `${option.borderColor} bg-[#222834] hover:bg-[#222834]/80`
