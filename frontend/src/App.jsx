@@ -10,7 +10,7 @@ import Profile from './pages/Profile'
 import Dashboard from './pages/Dashboard'
 
 function App() {
-  const [route, setRoute] = useState('accueil')
+  const [route, setRoute] = useState('profile')
 
   const renderPage = () => {
     switch (route) {
@@ -21,7 +21,7 @@ function App() {
       case 'signup':
         return <SignUp />
       case 'profile':
-        return <Profile />
+        return <Profile onNavigate={setRoute} />
       case 'dashboard':
         return <Dashboard />
       case 'accueil':
