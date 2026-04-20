@@ -1,12 +1,9 @@
-import { useState } from 'react'
+import HeroPage from './HeroPage'
+import HowItWorks from './components/HowItWorks'
+import Testimonials from './components/Testimonials'
+import CallToAction from './components/CallToAction'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import Accueil from './pages/Accueil'
-import Matchmaking from './pages/Matchmaking'
-import SignIn from './pages/SignIn'
-import SignUp from './pages/SignUp'
-import Profile from './pages/Profile'
-import Dashboard from './pages/Dashboard'
 
 function App() {
   const [route, setRoute] = useState('accueil')
