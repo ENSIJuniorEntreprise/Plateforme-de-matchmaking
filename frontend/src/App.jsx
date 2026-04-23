@@ -4,6 +4,13 @@ import Testimonials from './components/Testimonials'
 import CallToAction from './components/CallToAction'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import { useState } from 'react';
+import Matchmaking from './pages/Matchmaking.jsx'
+import SignIn from './pages/SignIn.jsx'
+import SignUp from './pages/SignUp.jsx'
+import Profile from './pages/Profile.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import Accueil from './pages/Accueil.jsx'
 
 function App() {
   const [route, setRoute] = useState('accueil')
