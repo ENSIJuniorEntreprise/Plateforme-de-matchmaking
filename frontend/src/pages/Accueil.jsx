@@ -1,9 +1,17 @@
 import React from 'react'
+import HeroPage from '../HeroPage'
+import HowItWorks from '../components/HowItWorks'
+import Testimonials from '../components/Testimonials'
+import CallToAction from '../components/CallToAction'
 
-const Accueil = () => {
+const Accueil = ({ onNavigate, user }) => {
   return (
-    <section className="page accueil">
-    </section>
+    <>
+      <HeroPage onNavigate={onNavigate} user={user} />
+      <HowItWorks />
+      <Testimonials />
+      <CallToAction onNavigate={onNavigate} />
+    </>
   )
 }
 
