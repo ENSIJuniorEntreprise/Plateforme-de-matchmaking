@@ -1,0 +1,7 @@
+node_modules/
+.env
+uploads/cv/*
+uploads/avatars/*
+!uploads/cv/.gitkeep
+!uploads/avatars/.gitkeep
+*.log
