@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { apiPost, resolveAssetUrl } from '../api/client'
 import briefcaseImage from '../assets/matchmaking/briefcase-image.svg'
-import jackMaImage from '../assets/matchmaking/jack-ma.jpg'
-import sophieChenImage from '../assets/matchmaking/sophie-chen.avif'
 import starbarsImage from '../assets/matchmaking/starbars-image.svg'
-import techAngelsOfficeImage from '../assets/matchmaking/techangels-office.jpg'
-import techFlowBuildingImage from '../assets/matchmaking/techflow-building.jpeg'
 import wrenchImage from '../assets/matchmaking/wrench-image.svg'
 
 const byPrefixAndName = {
@@ -195,64 +192,26 @@ const getBudgetFillColor = (index) => {
   return `rgb(${channel(start.r, end.r)}, ${channel(start.g, end.g)}, ${channel(start.b, end.b)})`
 }
 
-const resultMatches = [
-  {
-    id: 'techflow',
-    name: 'TechFlow AI',
-    location: 'Paris',
-    description: "Solution d'automatisation des workflows par IA générative.",
-    tags: ['AI/ML', 'SaaS', 'Serie A'],
-    avatarImage: techFlowBuildingImage,
-    compatibilityScore: 94,
-    proximityRank: 1,
-    avatarLabel: 'T',
-    avatarClass: 'bg-[radial-gradient(circle_at_top,#d6e8ff_0%,#b4c7e8_45%,#6b85a9_100%)]',
-    badgeIcon: byPrefixAndName.fas.briefcase,
-    badgeColor: 'bg-[#FF7033]',
-  },
-  {
-    id: 'sophie',
-    name: 'Sophie Chen',
-    location: 'Remote',
-    description: "Senior Full-Stack Developer, 8 ans d'expérience React/Node.",
-    tags: ['React', 'Node.js', 'TypeScript'],
-    avatarImage: sophieChenImage,
-    compatibilityScore: 97,
-    proximityRank: 3,
-    avatarLabel: 'SC',
-    avatarClass: 'bg-[radial-gradient(circle_at_top,#ffd8ea_0%,#f4abc7_45%,#b66d89_100%)]',
-    badgeIcon: byPrefixAndName.fas['user-group'],
-    badgeColor: 'bg-[#33BBFF]',
-  },
-  {
-    id: 'techangels',
-    name: 'TechAngels',
-    location: 'Europe',
-    description: "Business angels investissant dans l'innovation tech.",
-    tags: ['Pre-seed', 'Tech', 'Serie A'],
-    avatarImage: techAngelsOfficeImage,
-    compatibilityScore: 91,
-    proximityRank: 2,
-    avatarLabel: 'TA',
-    avatarClass: 'bg-[radial-gradient(circle_at_top,#d7f4ff_0%,#94d7e9_45%,#4d8ca1_100%)]',
-    badgeIcon: byPrefixAndName.fas['dollar-sign'],
-    badgeColor: 'bg-[#00FF80]',
-  },
-  {
-    id: 'jackma',
-    name: 'Jack Ma',
-    location: 'WorldWide',
-    description: 'Offre hebergement (bureaux, coworking), conseil et mentorat.',
-    tags: ['Tech', 'Finance', 'Seed'],
-    avatarImage: jackMaImage,
-    compatibilityScore: 86,
-    proximityRank: 4,
-    avatarLabel: 'JM',
-    avatarClass: 'bg-[radial-gradient(circle_at_top,#e1d7ff_0%,#8d7ef1_45%,#3d348f_100%)]',
-    badgeIcon: byPrefixAndName.fas.rocket,
-    badgeColor: 'bg-[#FFEE33]',
-  },
-]
+// Habillage visuel (icône/couleur) dérivé du rôle réel renvoyé par l'API
+const ROLE_BADGE = {
+  startup: { icon: byPrefixAndName.fas.briefcase, color: 'bg-[#FF7033]' },
+  talent: { icon: byPrefixAndName.fas['user-group'], color: 'bg-[#33BBFF]' },
+  investisseur: { icon: byPrefixAndName.fas['dollar-sign'], color: 'bg-[#00FF80]' },
+  incubateur: { icon: byPrefixAndName.fas.rocket, color: 'bg-[#FFEE33]' },
+}
+
+const ROLE_AVATAR_GRADIENT = {
+  startup: 'bg-[radial-gradient(circle_at_top,#d6e8ff_0%,#b4c7e8_45%,#6b85a9_100%)]',
+  talent: 'bg-[radial-gradient(circle_at_top,#ffd8ea_0%,#f4abc7_45%,#b66d89_100%)]',
+  investisseur: 'bg-[radial-gradient(circle_at_top,#d7f4ff_0%,#94d7e9_45%,#4d8ca1_100%)]',
+  incubateur: 'bg-[radial-gradient(circle_at_top,#e1d7ff_0%,#8d7ef1_45%,#3d348f_100%)]',
+}
+
+const mapSortBy = (label) => {
+  if (label === 'Par proximité') return 'proximite'
+  if (label === 'Par budget') return 'budget'
+  return 'compatibilite'
+}
 
 const SparklesIcon = ({ className = '' }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
@@ -425,6 +384,10 @@ const Matchmaking = ({ onNavigate }) => {
   const [budgetIndex, setBudgetIndex] = useState(0)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisProgress, setAnalysisProgress] = useState(18)
+  const [matches, setMatches] = useState([])
+  const [matchesError, setMatchesError] = useState('')
+  const [sortLoading, setSortLoading] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState({})
   const sectorMenuRef = useRef(null)
   const locationMenuRef = useRef(null)
   const sortMenuRef = useRef(null)
@@ -488,12 +451,25 @@ const Matchmaking = ({ onNavigate }) => {
     }
   }, [])
 
+  const buildSearchBody = (sortLabel = selectedSort) => ({
+    profileType: selectedProfile,
+    sectors: selectedSectors,
+    stage: activeStage,
+    location: selectedLocations.join('|'),
+    budgetRange: budgetRanges[budgetIndex],
+    query: '',
+    sortBy: mapSortBy(sortLabel),
+    page: 1,
+    limit: 20,
+  })
+
   useEffect(() => {
     if (!isAnalyzing) {
       return undefined
     }
 
     setAnalysisProgress(18)
+    setMatchesError('')
 
     const progressSteps = [18, 28, 39, 51, 63, 74, 85, 93]
     let stepIndex = 0
@@ -506,17 +482,55 @@ const Matchmaking = ({ onNavigate }) => {
       }
     }, 300)
 
-    const completionTimeout = window.setTimeout(() => {
+    let cancelled = false
+    const minDelay = new Promise((resolve) => window.setTimeout(resolve, 1400))
+
+    Promise.allSettled([apiPost('/matches/search', buildSearchBody()), minDelay]).then(([searchResult]) => {
+      if (cancelled) return
+      window.clearInterval(progressInterval)
       setAnalysisProgress(100)
       setIsAnalyzing(false)
-      setCurrentStep(3)
-    }, 2600)
+
+      if (searchResult.status === 'fulfilled') {
+        setMatches(searchResult.value.results || [])
+        setCurrentStep(3)
+      } else {
+        setMatchesError(searchResult.reason?.message || 'Impossible de lancer la recherche.')
+      }
+    })
 
     return () => {
+      cancelled = true
       window.clearInterval(progressInterval)
-      window.clearTimeout(completionTimeout)
     }
   }, [isAnalyzing])
+
+  const handleSortSelect = async (option) => {
+    setSelectedSort(option)
+    setIsSortMenuOpen(false)
+    if (currentStep !== 3) return
+
+    setSortLoading(true)
+    setMatchesError('')
+    try {
+      const data = await apiPost('/matches/search', buildSearchBody(option))
+      setMatches(data.results || [])
+    } catch (err) {
+      setMatchesError(err.message || 'Impossible de trier les résultats.')
+    } finally {
+      setSortLoading(false)
+    }
+  }
+
+  const handleConnect = async (userId) => {
+    setConnectionStatus((prev) => ({ ...prev, [userId]: 'loading' }))
+    try {
+      await apiPost(`/matches/connect/${userId}`)
+      setConnectionStatus((prev) => ({ ...prev, [userId]: 'sent' }))
+    } catch (err) {
+      setConnectionStatus((prev) => ({ ...prev, [userId]: err.message || 'error' }))
+    }
+  }
 
   const visualStep = isAnalyzing ? 3 : currentStep
   const missingCriteria = [
@@ -535,14 +549,6 @@ const Matchmaking = ({ onNavigate }) => {
     setIsLocationMenuOpen(false)
     setIsAnalyzing(true)
   }
-
-  const sortedMatches = [...resultMatches].sort((left, right) => {
-    if (selectedSort === 'Par proximité') {
-      return left.proximityRank - right.proximityRank
-    }
-
-    return right.compatibilityScore - left.compatibilityScore
-  })
 
   const steps = [
     {
@@ -902,7 +908,9 @@ const Matchmaking = ({ onNavigate }) => {
         ) : (
           <>
             <div className="mt-10 flex w-full flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-2xl font-semibold text-white sm:text-[2rem]">4 Matchs trouvés</h2>
+              <h2 className="text-2xl font-semibold text-white sm:text-[2rem]">
+                {matches.length} Match{matches.length > 1 ? 's' : ''} trouvé{matches.length > 1 ? 's' : ''}
+              </h2>
               <div ref={sortMenuRef} className="relative flex w-full items-center gap-3 sm:w-auto">
                 <button
                   type="button"
@@ -910,7 +918,7 @@ const Matchmaking = ({ onNavigate }) => {
                   className="matchmaking-button matchmaking-button-muted inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#A3A7B3] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B1B5C0] sm:w-auto"
                 >
                   <FilterIcon className="h-4 w-4" />
-                  Trier
+                  {sortLoading ? 'Tri…' : 'Trier'}
                   <ChevronDownIcon className={`h-4 w-4 transition ${isSortMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -920,10 +928,7 @@ const Matchmaking = ({ onNavigate }) => {
                       <button
                         key={option}
                         type="button"
-                        onClick={() => {
-                          setSelectedSort(option)
-                          setIsSortMenuOpen(false)
-                        }}
+                        onClick={() => handleSortSelect(option)}
                         className={`matchmaking-button flex w-full items-center rounded-[0.95rem] px-4 py-3 text-left text-sm font-semibold transition ${
                           selectedSort === option
                             ? 'bg-[#FF7033] text-white'
@@ -938,78 +943,116 @@ const Matchmaking = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="mt-7 grid w-full gap-8 md:grid-cols-2 xl:grid-cols-3">
-              {sortedMatches.map((match, index) => (
-                <div
-                  key={match.id}
-                  className="matchmaking-result-card relative min-h-[250px] sm:min-h-[285px]"
-                  style={{ animationDelay: `${index * 0.45}s` }}
-                >
-                  <article className="matchmaking-result-card-surface group absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24]">
-                    <div className="flex items-start gap-4">
-                      <div className="relative h-16 w-16 shrink-0">
-                        {match.avatarImage ? (
-                          <img
-                            src={match.avatarImage}
-                            alt={match.name}
-                            className="h-16 w-16 rounded-[1.2rem] object-cover object-center"
-                          />
-                        ) : (
-                          <div className={`flex h-16 w-16 items-center justify-center rounded-[1.2rem] text-lg font-bold text-white ${match.avatarClass}`}>
-                            {match.avatarLabel}
+            {matchesError && (
+              <p className="mt-6 w-full rounded-2xl border border-[rgba(232,74,0,0.35)] bg-[rgba(232,74,0,0.12)] px-5 py-3 text-center text-sm font-medium text-[#ff7043]">
+                {matchesError}
+              </p>
+            )}
+
+            {matches.length === 0 && !matchesError ? (
+              <p className="mt-10 w-full text-center text-base font-medium text-[#8F929F]">
+                Aucun résultat ne correspond à vos critères. Essayez d'élargir votre recherche.
+              </p>
+            ) : (
+              <div className="mt-7 grid w-full gap-8 md:grid-cols-2 xl:grid-cols-3">
+                {matches.map((match, index) => {
+                  const badge = ROLE_BADGE[match.role] || ROLE_BADGE.startup
+                  const avatarGradient = ROLE_AVATAR_GRADIENT[match.role] || ROLE_AVATAR_GRADIENT.startup
+                  const displayName = match.company || match.fullName || `${match.firstName || ''} ${match.lastName || ''}`.trim()
+                  const displayTags = match.tags?.length ? match.tags : (match.interests || [])
+                  const avatarSrc = resolveAssetUrl(match.avatarUrl)
+                  const status = connectionStatus[match._id]
+
+                  return (
+                    <div
+                      key={match._id}
+                      className="matchmaking-result-card relative min-h-[250px] sm:min-h-[285px]"
+                      style={{ animationDelay: `${index * 0.45}s` }}
+                    >
+                      <article className="matchmaking-result-card-surface group absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-[1.6rem] border border-[#AEB2BC] bg-[#F6F6F7] px-5 py-4 text-[#171A24]">
+                        <div className="flex items-start gap-4">
+                          <div className="relative h-16 w-16 shrink-0">
+                            {avatarSrc ? (
+                              <img
+                                src={avatarSrc}
+                                alt={displayName}
+                                className="h-16 w-16 rounded-[1.2rem] object-cover object-center"
+                              />
+                            ) : (
+                              <div className={`flex h-16 w-16 items-center justify-center rounded-[1.2rem] text-lg font-bold text-white ${avatarGradient}`}>
+                                {displayName.charAt(0).toUpperCase() || '?'}
+                              </div>
+                            )}
+                            <div className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full text-white ${badge.color}`}>
+                              <FontAwesomeIcon
+                                icon={badge.icon}
+                                style={{
+                                  color: '#ffffff',
+                                  transform: `scale(${badge.icon?.iconName === 'rocket' ? 0.88 : 0.62})`,
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <h3 className="text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[1.6rem]">
+                                {displayName}
+                              </h3>
+                              <span className="shrink-0 rounded-full bg-[#FF7033]/15 px-2.5 py-1 text-xs font-bold text-[#FF7033]">
+                                {match.compatibilityScore}%
+                              </span>
+                            </div>
+                            <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-[#8B8F9A]">
+                              <SvgIcon path={icons.location} className="h-3.5 w-3.5 text-[#8B8F9A]" />
+                              {match.location || 'Non renseigné'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="mt-5 text-sm font-semibold leading-6 text-[#8B8F9A]">
+                          {match.description || 'Aucune description pour le moment.'}
+                        </p>
+
+                        {displayTags.length > 0 && (
+                          <div className="mt-5 flex flex-wrap gap-3">
+                            {displayTags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="matchmaking-chip rounded-full bg-[#2F3241] px-4 py-1.5 text-xs font-semibold text-white"
+                              >
+                                {tag}
+                              </span>
+                            ))}
                           </div>
                         )}
-                        <div className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full text-white ${match.badgeColor}`}>
-                          <FontAwesomeIcon
-                            icon={match.badgeIcon}
-                            style={{
-                              color: '#ffffff',
-                              transform: `scale(${match.badgeIcon?.iconName === 'rocket' ? 0.88 : 0.62})`,
-                            }}
-                          />
+
+                        <div className="mt-5 flex flex-col gap-2 overflow-hidden sm:max-h-0 sm:flex-row sm:transition-all sm:duration-500 sm:group-hover:max-h-[68px]">
+                          <div className="flex w-full flex-col gap-2 transition-all duration-500 max-sm:translate-y-0 max-sm:opacity-100 sm:flex-row sm:pointer-events-none sm:translate-y-3 sm:opacity-0 sm:group-hover:pointer-events-auto sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
+                            <button
+                              type="button"
+                              onClick={() => onNavigate?.('profile', { userId: match._id, compatibilityScore: match.compatibilityScore })}
+                              className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#FF7033] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.24)] transition hover:bg-[#FF7B45]"
+                            >
+                              <StarOutlineIcon className="h-4 w-4" />
+                              Voir le profil
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleConnect(match._id)}
+                              disabled={status === 'loading' || status === 'sent'}
+                              className="matchmaking-button inline-flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#2F3241] px-5 py-3 text-base font-semibold text-white transition hover:bg-[#3C4150] disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                              {status === 'sent' ? 'Demande envoyée ✓' : status === 'loading' ? 'Envoi…' : 'Contacter'}
+                            </button>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="min-w-0">
-                        <h3 className="text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[2rem]">
-                          {match.name}
-                        </h3>
-                        <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-[#8B8F9A]">
-                          <SvgIcon path={icons.location} className="h-3.5 w-3.5 text-[#8B8F9A]" />
-                          {match.location}
-                        </p>
-                      </div>
+                      </article>
                     </div>
-
-                    <p className="mt-5 text-sm font-semibold leading-6 text-[#8B8F9A]">{match.description}</p>
-
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      {match.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="matchmaking-chip rounded-full bg-[#2F3241] px-4 py-1.5 text-xs font-semibold text-white"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-5 overflow-hidden sm:max-h-0 sm:transition-all sm:duration-500 sm:group-hover:max-h-[68px]">
-                      <div className="w-full transition-all duration-500 max-sm:translate-y-0 max-sm:opacity-100 sm:pointer-events-none sm:translate-y-3 sm:opacity-0 sm:group-hover:pointer-events-auto sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
-                        <button
-                          type="button"
-                          onClick={() => onNavigate?.('profile')}
-                          className="matchmaking-button matchmaking-button-primary inline-flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#FF7033] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_24px_rgba(255,112,51,0.24)] transition hover:bg-[#FF7B45]"
-                        >
-                          <StarOutlineIcon className="h-4 w-4" />
-                          Voir le profil
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                </div>
-              ))}
-            </div>
+                  )
+                })}
+              </div>
+            )}
 
             <div className="mt-8 flex w-full">
               <button

@@ -1,38 +1,5 @@
 import { useState, useEffect } from "react";
-/* ── Data ───────────────────────────────────────────────── */
-const DATA = {
-  name: "TechFlow AI",
-  tagline: "Solution d'automatisation des workflows par IA générative",
-  location: "Paris, France",
-  founded: "Fondée en 2023",
-  size: "11-50 employés",
-  tags: ["AI/ML", "SaaS", "B2B", "Automatisation"],
-  matchScore: 88,
-  accomplishments: [
-    { icon: "🏆", label: "Station F Batch 2023" },
-    { icon: "📈", label: "€500k AAR" },
-    { icon: "👥", label: "+100 clients" },
-  ],
-  about: [
-    "TechFlow AI développe une plateforme SaaS révolutionnaire qui utilise l'intelligence artificielle générative pour automatiser les workflows complexes des entreprises.",
-    "Notre solution permet aux équipes de réduire de 70% le temps passé sur les tâches répétitives, tout en améliorant la précision et la cohérence des processus métier.",
-    "Nous recherchons activement des talents passionnés par l'IA et des investisseurs visionnaires pour nous accompagner dans notre phase de croissance.",
-  ],
-  skills: [
-    { label: "Intelligence Artificielle", value: 95 },
-    { label: "Automatisation",            value: 90 },
-    { label: "Cloud Native",              value: 85 },
-    { label: "API First",                 value: 88 },
-    { label: "Entreprise Ready",          value: 80 },
-  ],
-  parcours: [
-    { date: "Jan 2023", title: "Création",        desc: "Lancement de TechFlow AI" },
-    { date: "Avr 2023", title: "Station F",        desc: "Intégration au programme" },
-    { date: "Sep 2023", title: "Premiers Clients", desc: "10 entreprises pilotes" },
-    { date: "Jan 2024", title: "Seed Round",       desc: "Levée de €2M" },
-    { date: "Mai 2025", title: "Scale-Up",         desc: "100+ clients actifs" },
-  ],
-};
+import { apiGet, resolveAssetUrl } from "../api/client";
 
 /* ── SVG Icons ──────────────────────────────────────────── */
 const iconPaths = {
@@ -50,37 +17,43 @@ const Ico = ({ n, s = 14, c = "currentColor" }) => (
   </svg>
 );
 
-/* ── Circular Match Score ───────────────────────────────── */
-function MatchScore({ score , onNavigate }) {
+/* ── Circular Match Score (uniquement si un score de compatibilité a été transmis) ── */
+function MatchScore({ score, onNavigate }) {
   const [prog, setProg] = useState(0);
   const R = 38, C = 2 * Math.PI * R;
+  const hasScore = typeof score === "number";
   useEffect(() => {
+    if (!hasScore) return;
     const t = setTimeout(() => setProg(score), 400);
     return () => clearTimeout(t);
-  }, [score]);
+  }, [score, hasScore]);
 
   return (
     <div className="bg-[#1a1d27] rounded-2xl p-4 border border-white/[0.07]">
-      <p className="text-white font-bold text-sm text-center mb-4">
-        Score de compatibilité
-      </p>
-      <div className="flex justify-center mb-4">
-        <div className="relative w-24 h-24">
-          <svg width="96" height="96" viewBox="0 0 100 100" className="-rotate-90">
-            <circle cx="50" cy="50" r={R} fill="none" stroke="#252836" strokeWidth="10" />
-            <circle
-              cx="50" cy="50" r={R} fill="none"
-              stroke="#f97316" strokeWidth="10"  strokeLinecap="round"
-              strokeDasharray={`${(prog / 100) * C} ${C}`}
-              style={{ transition: "stroke-dasharray 1.4s cubic-bezier(0.34,1.4,0.64,1)" }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xl font-extrabold text-white leading-none">{score}%</span>
-            <span className="text-[10px] text-orange-400 font-semibold mt-0.5">Match</span>
+      {hasScore && (
+        <>
+          <p className="text-white font-bold text-sm text-center mb-4">
+            Score de compatibilité
+          </p>
+          <div className="flex justify-center mb-4">
+            <div className="relative w-24 h-24">
+              <svg width="96" height="96" viewBox="0 0 100 100" className="-rotate-90">
+                <circle cx="50" cy="50" r={R} fill="none" stroke="#252836" strokeWidth="10" />
+                <circle
+                  cx="50" cy="50" r={R} fill="none"
+                  stroke="#f97316" strokeWidth="10"  strokeLinecap="round"
+                  strokeDasharray={`${(prog / 100) * C} ${C}`}
+                  style={{ transition: "stroke-dasharray 1.4s cubic-bezier(0.34,1.4,0.64,1)" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-xl font-extrabold text-white leading-none">{score}%</span>
+                <span className="text-[10px] text-orange-400 font-semibold mt-0.5">Match</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
       <button
         onClick={() => onNavigate("matchmaking")}
         className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-orange-500/30 hover:scale-[1.02]"
@@ -93,6 +66,7 @@ function MatchScore({ score , onNavigate }) {
 
 /* ── Accomplishments ────────────────────────────────────── */
 function Accomplishments({ items }) {
+  if (!items?.length) return null;
   return (
     <div className="bg-[#1a1d27] rounded-2xl p-4 border border-white/[0.07] mt-3">
       <p className="text-white font-bold text-sm mb-3">Accomplissement</p>
@@ -110,7 +84,7 @@ function Accomplishments({ items }) {
     e.currentTarget.style.boxShadow = "none";
     e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
   }}
->            <span className="text-base">{item.icon}</span>
+>            <span className="text-base">{item.icon || "🏆"}</span>
             <span className="text-gray-200 text-sm font-medium">{item.label}</span>
           </div>
         ))}
@@ -194,10 +168,21 @@ function TimelineItem({ date, title, desc, isLast, idx, run }) {
   );
 }
 
+function EmptySection({ text }) {
+  return <p className="text-sm text-gray-500 italic">{text}</p>;
+}
+
 /* ── Main Page ──────────────────────────────────────────── */
 const TABS = ["A propos", "Competence", "Parcours"];
 
-export default function ProfilePage({ onNavigate }) {
+export default function ProfilePage({ onNavigate, userId, currentUser, matchScore }) {
+  const targetId = userId || currentUser?._id;
+  const isOwnProfile = Boolean(currentUser && targetId === currentUser._id);
+
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(Boolean(targetId));
+  const [error, setError] = useState("");
+
   const [tab, setTab]       = useState(0);
   const [animKey, setAnimKey] = useState(0);
   const [out, setOut]       = useState(false);
@@ -205,7 +190,28 @@ export default function ProfilePage({ onNavigate }) {
   const [favori, setFavori] = useState(false);
   const [partagerVisible, setPartagerVisible] = useState(false);
   const [contactVisible, setContactVisible] = useState(false);
-  
+
+  useEffect(() => {
+    if (!targetId) return undefined;
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await apiGet(`/users/${targetId}`);
+        if (!cancelled) setProfile(data.user);
+      } catch (err) {
+        if (!cancelled) setError(err.message || "Impossible de charger ce profil.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    load();
+    return () => { cancelled = true; };
+  }, [targetId]);
+
   function changeTab(i) {
     if (i === tab || out) return;
     setDir(i > tab ? 1 : -1);
@@ -216,6 +222,56 @@ export default function ProfilePage({ onNavigate }) {
       setOut(false);
     }, 230);
   }
+
+  if (!targetId) {
+    return (
+      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center p-5">
+        <div className="bg-[#1a1d27] rounded-2xl p-8 border border-white/[0.08] text-center max-w-sm">
+          <p className="text-white font-bold text-lg mb-2">Connectez-vous</p>
+          <p className="text-gray-400 text-sm mb-5">Vous devez être connecté pour consulter un profil.</p>
+          <button
+            onClick={() => onNavigate && onNavigate("signin")}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+          >
+            Se connecter
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center p-5">
+        <p className="text-gray-400 text-sm">Chargement du profil…</p>
+      </div>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center p-5">
+        <div className="bg-[#1a1d27] rounded-2xl p-8 border border-white/[0.08] text-center max-w-sm">
+          <p className="text-white font-bold text-lg mb-2">Profil introuvable</p>
+          <p className="text-gray-400 text-sm">{error || "Ce profil n'existe pas ou plus."}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayName = profile.company || profile.fullName || `${profile.firstName || ""} ${profile.lastName || ""}`.trim() || "Profil";
+  const subtitle = profile.tagline || profile.description || "";
+  const avatarUrl = resolveAssetUrl(profile.avatarUrl);
+  const initials = displayName.slice(0, 2).toUpperCase();
+  const metaItems = [
+    profile.location ? ["location", profile.location] : null,
+    profile.founded ? ["calendar", profile.founded] : null,
+    profile.size ? ["users", profile.size] : null,
+  ].filter(Boolean);
+  const tags = profile.tags?.length ? profile.tags : (profile.interests || []);
+  const about = profile.about?.length ? profile.about : (profile.description ? [profile.description] : []);
+  const skills = profile.skills || [];
+  const parcours = profile.parcours || [];
 
   return (
     <>
@@ -252,7 +308,7 @@ export default function ProfilePage({ onNavigate }) {
 
             {/* Avatar — centered vertically on the banner */}
             <div
-              className="absolute left-3 sm:left-5 flex items-center justify-center rounded-2xl z-10"
+              className="absolute left-3 sm:left-5 flex items-center justify-center rounded-2xl z-10 overflow-hidden"
               style={{
                 top: "50%", transform: "translateY(-50%)",
                 width: 100, height: 100,
@@ -261,7 +317,11 @@ export default function ProfilePage({ onNavigate }) {
                 boxShadow: "0 4px 24px rgba(249,115,22,0.6)",
               }}
             >
-              <span className="text-white font-extrabold text-3xl tracking-tight">TF</span>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-white font-extrabold text-3xl tracking-tight">{initials}</span>
+              )}
             </div>
           </div>
 
@@ -270,22 +330,26 @@ export default function ProfilePage({ onNavigate }) {
 
             {/* Name + meta */}
             <div className="flex-1 min-w-[180px]">
-              <h1 className="text-white text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">TechFlow AI</h1>
-              <p className="text-gray-400 text-xm mt-0.5">Solution d'automatisation des workflows par IA générative</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                {[["location","Paris, France"],["calendar","Fondée en 2023"],["users","11-50 employés"]].map(([ic, txt]) => (
-                  <span key={txt} className="flex items-center gap-1 text-[15px] text-gray-400">
-                    <Ico n={ic} s={12} c="#9ca3af" />{txt}
-                  </span>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {DATA.tags.map(t => (
-                  <span key={t} className="px-3 py-0.5 rounded-full text-[11px] font-semibold text-orange-300 border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition-colors cursor-default">
-                    {t}
-                  </span>
-                ))}
-              </div>
+              <h1 className="text-white text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">{displayName}</h1>
+              {subtitle && <p className="text-gray-400 text-xm mt-0.5">{subtitle}</p>}
+              {metaItems.length > 0 && (
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                  {metaItems.map(([ic, txt]) => (
+                    <span key={txt} className="flex items-center gap-1 text-[15px] text-gray-400">
+                      <Ico n={ic} s={12} c="#9ca3af" />{txt}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {tags.map(t => (
+                    <span key={t} className="px-3 py-0.5 rounded-full text-[11px] font-semibold text-orange-300 border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition-colors cursor-default">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
 {/* Action buttons */}
@@ -314,13 +378,15 @@ export default function ProfilePage({ onNavigate }) {
   </button>
 
   {/* Contacter */}
-  <button
-    onClick={() => setContactVisible(true)}
-    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-200"
-  >
-    <Ico n="chat" s={13} c="#fff" />
-    Contacter
-  </button>
+  {!isOwnProfile && (
+    <button
+      onClick={() => setContactVisible(true)}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-200"
+    >
+      <Ico n="chat" s={13} c="#fff" />
+      Contacter
+    </button>
+  )}
 
 </div>
 
@@ -387,7 +453,7 @@ export default function ProfilePage({ onNavigate }) {
 {contactVisible && (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
     <div className="bg-[#1a1d27] rounded-2xl p-6 w-full max-w-md border border-white/10 shadow-2xl">
-      <h3 className="text-white font-bold text-lg mb-4">Contacter TechFlow AI</h3>
+      <h3 className="text-white font-bold text-lg mb-4">Contacter {displayName}</h3>
       <textarea
         className="w-full bg-[#0f1117] text-white text-sm rounded-xl p-3 border border-white/10 resize-none outline-none focus:border-orange-500 transition-colors"
         rows={4}
@@ -459,7 +525,7 @@ export default function ProfilePage({ onNavigate }) {
               {tab === 0 && (
                 <div>
                   <h2 className="text-xl font-extrabold text-gray-900 mb-4 tracking-tight">A propos</h2>
-                  {DATA.about.map((p, i) => (
+                  {about.length > 0 ? about.map((p, i) => (
                     <p
                       key={i}
                       className={`text-base leading-relaxed text-gray-600 mb-3 ${i === 0 ? "font-semibold" : "font-normal"}`}
@@ -467,7 +533,7 @@ export default function ProfilePage({ onNavigate }) {
                     >
                       {p}
                     </p>
-                  ))}
+                  )) : <EmptySection text="Aucune description disponible pour le moment." />}
                 </div>
               )}
 
@@ -475,9 +541,9 @@ export default function ProfilePage({ onNavigate }) {
               {tab === 1 && (
                 <div>
                   <h2 className="text-xl font-extrabold text-gray-900 mb-5 tracking-tight">Compétences clés</h2>
-                  {DATA.skills.map((s, i) => (
+                  {skills.length > 0 ? skills.map((s, i) => (
                     <SkillBar key={s.label + animKey} label={s.label} value={s.value} delay={i * 100} run={!out} />
-                  ))}
+                  )) : <EmptySection text="Aucune compétence renseignée pour le moment." />}
                 </div>
               )}
 
@@ -485,14 +551,14 @@ export default function ProfilePage({ onNavigate }) {
               {tab === 2 && (
                 <div>
                   <h2 className="text-xl font-extrabold text-gray-900 mb-5 tracking-tight">Notre parcours</h2>
-                  {DATA.parcours.map((item, i) => (
+                  {parcours.length > 0 ? parcours.map((item, i) => (
                     <TimelineItem
                       key={i + animKey} idx={i}
                       date={item.date} title={item.title} desc={item.desc}
-                      isLast={i === DATA.parcours.length - 1}
+                      isLast={i === parcours.length - 1}
                       run={!out}
                     />
-                  ))}
+                  )) : <EmptySection text="Aucun parcours renseigné pour le moment." />}
                 </div>
               )}
             </div>
@@ -500,8 +566,8 @@ export default function ProfilePage({ onNavigate }) {
 
           {/* Right sidebar */}
           <div className="w-full lg:w-52 lg:shrink-0">
-            <MatchScore score={DATA.matchScore} onNavigate={onNavigate} />  
-            <Accomplishments items={DATA.accomplishments} />
+            <MatchScore score={matchScore} onNavigate={onNavigate} />
+            <Accomplishments items={profile.accomplishments} />
           </div>
 
         </div>

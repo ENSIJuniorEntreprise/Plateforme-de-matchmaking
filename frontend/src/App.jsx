@@ -14,29 +14,49 @@ import Accueil from './pages/Accueil.jsx'
 
 function App() {
   const [route, setRoute] = useState('accueil')
+  // Id du profil consulté quand on navigue vers 'profile' (null = profil de l'utilisateur connecté)
+  const [viewedUserId, setViewedUserId] = useState(null)
+  // Score de compatibilité connu au moment de la navigation (ex: depuis Matchmaking), sinon null
+  const [viewedMatchScore, setViewedMatchScore] = useState(null)
   // Global auth state shared across all components
-  const [user, setUser] = useState(null) // null = logged out, { name: 'John Doe' } = logged in
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('user')
+      return stored ? JSON.parse(stored) : null
+    } catch {
+      return null
+    }
+  }) // null = logged out, { ...profil } = connecté
 
-  const handleLogin = (userData) => {
-    setUser(userData || { name: 'John Doe' })
-    setRoute('accueil')
+  const handleLogin = ({ user: userData, token }) => {
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(userData))
+    setUser(userData)
+    setRoute('dashboard')
+  }
+
+  // params.userId optionnel : permet à Matchmaking/Dashboard d'ouvrir le profil d'un match précis
+  const handleNavigate = (page, params) => {
+    setRoute(page)
+    setViewedUserId(page === 'profile' ? params?.userId || null : null)
+    setViewedMatchScore(page === 'profile' && typeof params?.compatibilityScore === 'number' ? params.compatibilityScore : null)
   }
 
   const renderPage = () => {
     switch (route) {
       case 'matchmaking':
-        return <Matchmaking onNavigate={setRoute} />
+        return <Matchmaking onNavigate={handleNavigate} />
       case 'signin':
-        return <SignIn onNavigate={setRoute} onLogin={handleLogin} />
+        return <SignIn onNavigate={handleNavigate} onLogin={handleLogin} />
       case 'signup':
-        return <SignUp onNavigate={setRoute} onLogin={handleLogin} user={user} />
+        return <SignUp onNavigate={handleNavigate} onLogin={handleLogin} user={user} />
       case 'profile':
-        return <Profile onNavigate={setRoute} />
+        return <Profile onNavigate={handleNavigate} userId={viewedUserId} currentUser={user} matchScore={viewedMatchScore} />
       case 'dashboard':
-        return <Dashboard onNavigate={setRoute} />
+        return <Dashboard onNavigate={handleNavigate} user={user} />
       case 'accueil':
       default:
-        return <Accueil onNavigate={setRoute} user={user} />
+        return <Accueil onNavigate={handleNavigate} user={user} />
     }
   }
 
@@ -44,7 +64,7 @@ function App() {
     <div className="font-inter flex min-h-screen w-full flex-col overflow-x-hidden">
       <Navbar
         currentPage={route}
-        onNavigate={setRoute}
+        onNavigate={handleNavigate}
         hideNav={!['accueil', 'matchmaking', 'dashboard'].includes(route)}
         user={user}
       />
@@ -52,7 +72,7 @@ function App() {
         {renderPage()}
       </main>
       {['accueil', 'matchmaking', 'dashboard'].includes(route) && (
-        <Footer onNavigate={setRoute} />
+        <Footer onNavigate={handleNavigate} />
       )}
     </div>
   )

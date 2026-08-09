@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { register as apiRegister } from "../api/auth";
 
-function Update({ prevStep, form, setform }) {
+function Update({ prevStep, form, setform, onLogin }) {
   const domains = [
     "Tech", "FinTech", "HealthTech", "EdTech", "GreenTech", "AI/ML",
     "Ecommerce", "SaaS", "Crypto/Web", "Gaming", "LegalTech", "FoodTech", "AgriTech"
   ];
 
   const [selected, setSelected] = useState(form.interests || []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const domselect = (item) => {
     let domsel;
@@ -19,9 +22,19 @@ function Update({ prevStep, form, setform }) {
     setform({ ...form, interests: domsel });
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    if (selected.length === 0 || loading) return;
+    setError("");
+    setLoading(true);
+    try {
+      const data = await apiRegister(form);
+      if (onLogin) onLogin({ user: data.user, token: data.token });
+    } catch (err) {
+      setError(err.message || "Erreur lors de la création du compte");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,20 +62,25 @@ function Update({ prevStep, form, setform }) {
 
         <p className="mb-4 text-[#94A3B8] text-center">{selected.length} secteur(s) sélectionné(s)</p>
 
+        {error && (
+          <p className="mb-4 text-center text-sm font-medium text-red-400">{error}</p>
+        )}
+
         <div className="flex justify-between mt-4">
           <button
             type="button"
             onClick={prevStep}
-            className="text-white px-6 py-2 rounded-[10px] border border-orange-500 hover:bg-orange-500 hover:scale-105 cursor-pointer transition"
+            disabled={loading}
+            className="text-white px-6 py-2 rounded-[10px] border border-orange-500 hover:bg-orange-500 hover:scale-105 cursor-pointer transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             ← Retour
           </button>
           <button
             type="submit"
-            disabled={selected.length === 0}
-            className="bg-orange-500 text-white px-6 py-2 rounded-[10px] hover:scale-105 cursor-pointer transition "
+            disabled={selected.length === 0 || loading}
+            className="bg-orange-500 text-white px-6 py-2 rounded-[10px] hover:scale-105 cursor-pointer transition disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            Créer mon compte
+            {loading ? "Création…" : "Créer mon compte"}
           </button>
         </div>
       </form>

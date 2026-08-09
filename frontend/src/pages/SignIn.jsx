@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Sparkles, User, Lock, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
+import { login as apiLogin } from "../api/auth";
 
 // ─── SVG icons ────────────────────────────────────────────────────────────────
 
@@ -100,15 +101,18 @@ export default function ConnexionPage({ onNavigate, onLogin }) {
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!canSubmit) return;
     setError("");
     setLoadingLogin(true);
-    // Simulate login success (replace with real API call)
-    setTimeout(() => {
+    try {
+      const data = await apiLogin({ email: email.trim(), password });
+      if (onLogin) onLogin({ user: data.user, token: data.token });
+    } catch (err) {
+      setError(err.message || "Email ou mot de passe incorrect");
+    } finally {
       setLoadingLogin(false);
-      if (onLogin) onLogin({ name: "John Doe" });
-    }, 1000);
+    }
   };
 
   const handleGoogle = () => {

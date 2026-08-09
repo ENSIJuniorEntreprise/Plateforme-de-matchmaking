@@ -222,7 +222,7 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
                   <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#FF540B]">
                     <User strokeWidth={2} className="h-4 w-4 text-white" />
                   </div>
-                  <span className="font-inter text-[14px] font-semibold text-white">{user.name}</span>
+                  <span className="font-inter text-[14px] font-semibold text-white">{user.fullName || user.name}</span>
                 </div>
                 <button
                   className="font-inter flex cursor-pointer items-center gap-[6px] rounded-[12px] border-[1.5px] border-[#FF540B] bg-transparent px-[14px] py-[7px] text-[13px] font-semibold text-[#FF540B] transition-all duration-200 hover:bg-[rgba(255,84,11,0.10)]"

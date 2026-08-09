@@ -28,7 +28,7 @@ function ProgressBar({ step }) {
   );
 }
 
-function FormWizard() {
+function FormWizard({ onLogin }) {
   const [step, setStep] = useState(1);
 
   const [form, setform] = useState({
@@ -54,7 +54,7 @@ function FormWizard() {
         {step === 1 && <Choose form={form} setform={setform} nextStep={nextStep} />}
         {step === 2 && <Formulaire form={form} setform={setform} nextStep={nextStep} prevStep={prevStep} />}
         {step === 3 && <Formulaire2 form={form} setform={setform} prevStep={prevStep} nextStep={nextStep}/>}
-        {step === 4 && <Update form={form} setform={setform} prevStep={prevStep} />}
+        {step === 4 && <Update form={form} setform={setform} prevStep={prevStep} onLogin={onLogin} />}
       </div>
     </div>
   );
