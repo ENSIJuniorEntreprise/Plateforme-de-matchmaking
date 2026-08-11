@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { apiGet, resolveAssetUrl } from "../api/client";
+import { apiGet, apiPost, apiPatch, apiDelete, resolveAssetUrl } from "../api/client";
 
 /* ── SVG Icons ──────────────────────────────────────────── */
 const iconPaths = {
@@ -10,6 +10,7 @@ const iconPaths = {
   share:    "M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z",
   chat:     "M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z",
   bolt:     "M7 2v11h3v9l7-12h-4l4-8z",
+  edit:     "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
 };
 const Ico = ({ n, s = 14, c = "currentColor" }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill={c} className="shrink-0">
@@ -172,6 +173,18 @@ function EmptySection({ text }) {
   return <p className="text-sm text-gray-500 italic">{text}</p>;
 }
 
+/* ── Edit profile form field ───────────────────────────── */
+const editInputCls = "w-full bg-[#11141d] text-white text-sm rounded-lg p-2.5 border border-white/10 outline-none focus:border-orange-500 transition-colors";
+
+function Field({ label, children }) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="text-xs font-semibold text-gray-400">{label}</span>
+      {children}
+    </label>
+  );
+}
+
 /* ── Main Page ──────────────────────────────────────────── */
 const TABS = ["A propos", "Competence", "Parcours"];
 
@@ -188,8 +201,17 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
   const [out, setOut]       = useState(false);
   const [dir, setDir]       = useState(1);
   const [favori, setFavori] = useState(false);
+  const [favoriBusy, setFavoriBusy] = useState(false);
   const [partagerVisible, setPartagerVisible] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [contactVisible, setContactVisible] = useState(false);
+  const [contactMessage, setContactMessage] = useState("");
+  const [sendingContact, setSendingContact] = useState(false);
+  const [contactError, setContactError] = useState("");
+  const [editVisible, setEditVisible] = useState(false);
+  const [editForm, setEditForm] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editError, setEditError] = useState("");
 
   useEffect(() => {
     if (!targetId) return undefined;
@@ -211,6 +233,145 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
     load();
     return () => { cancelled = true; };
   }, [targetId]);
+
+  useEffect(() => {
+    const favs = currentUser?.favorites || [];
+    setFavori(favs.some((id) => String(id?._id || id) === String(targetId)));
+  }, [currentUser, targetId]);
+
+  async function toggleFavori() {
+    if (!currentUser) {
+      onNavigate && onNavigate("signin");
+      return;
+    }
+    if (isOwnProfile || favoriBusy) return;
+
+    const next = !favori;
+    setFavori(next);
+    setFavoriBusy(true);
+    try {
+      if (next) {
+        await apiPost(`/users/me/favorites/${targetId}`);
+      } else {
+        await apiDelete(`/users/me/favorites/${targetId}`);
+      }
+      // Persiste localement pour que l'état des favoris survive à un rafraîchissement
+      try {
+        const stored = JSON.parse(localStorage.getItem("user") || "null");
+        if (stored) {
+          const favorites = new Set((stored.favorites || []).map(String));
+          if (next) favorites.add(String(targetId));
+          else favorites.delete(String(targetId));
+          stored.favorites = Array.from(favorites);
+          localStorage.setItem("user", JSON.stringify(stored));
+        }
+      } catch {
+        // pas bloquant pour l'action elle-même
+      }
+    } catch {
+      setFavori(!next);
+    } finally {
+      setFavoriBusy(false);
+    }
+  }
+
+  async function copyProfileLink() {
+    const url = `${window.location.origin}/profile/${targetId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Fallback pour les navigateurs sans permission Clipboard API (contexte non sécurisé, etc.)
+      const textarea = document.createElement("textarea");
+      textarea.value = url;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  }
+
+  function closeContactModal() {
+    setContactVisible(false);
+    setContactMessage("");
+    setContactError("");
+  }
+
+  async function handleSendContact() {
+    const content = contactMessage.trim();
+    if (!content || sendingContact) return;
+    setSendingContact(true);
+    setContactError("");
+    try {
+      await apiPost(`/messages/${targetId}`, { content });
+      setContactVisible(false);
+      setContactMessage("");
+      onNavigate && onNavigate("messages", { contactId: targetId });
+    } catch (err) {
+      setContactError(err.message || "Échec de l'envoi du message.");
+    } finally {
+      setSendingContact(false);
+    }
+  }
+
+  function openEdit() {
+    setEditForm({
+      firstName: profile.firstName || "",
+      lastName: profile.lastName || "",
+      company: profile.company || "",
+      location: profile.location || "",
+      link: profile.link || "",
+      tagline: profile.tagline || "",
+      founded: profile.founded || "",
+      size: profile.size || "",
+      description: profile.description || "",
+      interests: (profile.interests || []).join(", "),
+      tags: (profile.tags || []).join(", "),
+    });
+    setEditError("");
+    setEditVisible(true);
+  }
+
+  async function handleSaveEdit(e) {
+    e.preventDefault();
+    if (savingEdit) return;
+    setSavingEdit(true);
+    setEditError("");
+    try {
+      const link = editForm.link.trim();
+      const normalizedLink = link && !/^https?:\/\//i.test(link) ? `https://${link}` : link;
+      const payload = {
+        firstName: editForm.firstName.trim(),
+        lastName: editForm.lastName.trim(),
+        company: editForm.company.trim(),
+        location: editForm.location.trim(),
+        link: normalizedLink,
+        tagline: editForm.tagline.trim(),
+        founded: editForm.founded.trim(),
+        size: editForm.size.trim(),
+        description: editForm.description.trim(),
+        interests: editForm.interests.split(",").map((s) => s.trim()).filter(Boolean),
+        tags: editForm.tags.split(",").map((s) => s.trim()).filter(Boolean),
+      };
+      const data = await apiPatch("/users/me", payload);
+      setProfile(data.user);
+      // Garde le localStorage synchronisé (nom affiché dans la Navbar, etc.)
+      try {
+        const stored = JSON.parse(localStorage.getItem("user") || "null");
+        if (stored) localStorage.setItem("user", JSON.stringify({ ...stored, ...data.user }));
+      } catch {
+        // pas bloquant
+      }
+      setEditVisible(false);
+    } catch (err) {
+      setEditError(err.message || "Échec de la mise à jour du profil.");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
 
   function changeTab(i) {
     if (i === tab || out) return;
@@ -356,17 +517,20 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
 <div className="flex gap-2 flex-wrap pt-1 w-full lg:w-auto">
 
   {/* Ajouter aux favoris */}
-  <button
-    onClick={() => setFavori(!favori)}
-    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xm font-semibold transition-all duration-200 border hover:border-orange-400 ${
-      favori
-        ? "bg-orange-500 text-white border-orange-500"
-        : "border-orange-500/60 text-orange-400 bg-transparent"
-    }`}
-  >
-    {favori ? "✓" : <Ico n="star" s={13} c="#fb923c" />}
-    {favori ? "Ajouté aux favoris" : "Ajouter aux favoris"}
-  </button>
+  {!isOwnProfile && (
+    <button
+      onClick={toggleFavori}
+      disabled={favoriBusy}
+      className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xm font-semibold transition-all duration-200 border hover:border-orange-400 disabled:cursor-not-allowed disabled:opacity-60 ${
+        favori
+          ? "bg-orange-500 text-white border-orange-500"
+          : "border-orange-500/60 text-orange-400 bg-transparent"
+      }`}
+    >
+      {favori ? "✓" : <Ico n="star" s={13} c="#fb923c" />}
+      {favori ? "Ajouté aux favoris" : "Ajouter aux favoris"}
+    </button>
+  )}
 
   {/* Partager */}
   <button
@@ -388,6 +552,17 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
     </button>
   )}
 
+  {/* Modifier mon profil */}
+  {isOwnProfile && (
+    <button
+      onClick={openEdit}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-200"
+    >
+      <Ico n="edit" s={13} c="#fff" />
+      Modifier mon profil
+    </button>
+  )}
+
 </div>
 
 {/* Modal Partager */}
@@ -396,52 +571,24 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
   style={{ animation: "fadeIn 0.2s ease" }}>
   <div className="bg-[#1a1d27] rounded-2xl p-6 w-80 border border-white/10 shadow-2xl"
     style={{ animation: "popUp 0.3s cubic-bezier(0.34,1.56,0.64,1)" }}>
-      <h3 className="text-white font-bold text-lg mb-5 text-center">Partager via</h3>
-      <div className="flex justify-center gap-6 mb-6">
+      <h3 className="text-white font-bold text-lg mb-4 text-center">Partager ce profil</h3>
 
-        {/* Facebook */}
-        <a href="https://www.facebook.com/login" target="_blank" rel="noreferrer"
-          className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200"
-  style={{ background: "#11141d", border: "2px solid #f97316" }}>
-
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-            </svg>
-          </div>
-          <span className="text-xs text-gray-400 group-hover:text-white transition-colors">Facebook</span>
-        </a>
-
-        {/* Instagram */}
-        <a href="https://www.instagram.com/accounts/login" target="_blank" rel="noreferrer"
-          className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl bg-[#11141d] border-2 border-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-              <circle cx="12" cy="12" r="4"/>
-              <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/>
-            </svg>
-          </div>
-          <span className="text-xs text-gray-400 group-hover:text-white transition-colors">Instagram</span>
-        </a>
-
-        {/* LinkedIn */}
-        <a href="https://www.linkedin.com/login" target="_blank" rel="noreferrer"
-          className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-2xl bg-[#11141d] border-2 border-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
-
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
-              <circle cx="4" cy="4" r="2"/>
-            </svg>
-          </div>
-          <span className="text-xs text-gray-400 group-hover:text-white transition-colors">LinkedIn</span>
-        </a>
-
+      <div className="bg-[#11141d] border border-white/10 rounded-xl px-3 py-2.5 mb-4 overflow-hidden">
+        <p className="text-gray-400 text-xs truncate">{`${window.location.origin}/profile/${targetId}`}</p>
       </div>
+
+      <button
+        onClick={copyProfileLink}
+        className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200 ${
+          linkCopied ? "bg-green-600 text-white" : "bg-orange-500 text-white hover:bg-orange-600"
+        }`}
+      >
+        {linkCopied ? "✓ Lien copié !" : "Copier le lien"}
+      </button>
+
       <button
         onClick={() => setPartagerVisible(false)}
-        className="w-full py-2 rounded-xl text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors"
+        className="w-full py-2 mt-3 rounded-xl text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors"
       >
         Fermer
       </button>
@@ -455,24 +602,121 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
     <div className="bg-[#1a1d27] rounded-2xl p-6 w-full max-w-md border border-white/10 shadow-2xl">
       <h3 className="text-white font-bold text-lg mb-4">Contacter {displayName}</h3>
       <textarea
+        value={contactMessage}
+        onChange={(e) => setContactMessage(e.target.value)}
         className="w-full bg-[#0f1117] text-white text-sm rounded-xl p-3 border border-white/10 resize-none outline-none focus:border-orange-500 transition-colors"
         rows={4}
         placeholder="Écrivez votre message..."
       />
+      {contactError && (
+        <p className="mt-2 text-xs font-medium text-[#ff7043]">{contactError}</p>
+      )}
       <div className="flex gap-3 mt-4 justify-end">
         <button
-          onClick={() => setContactVisible(false)}
-          className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors"
+          onClick={closeContactModal}
+          disabled={sendingContact}
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors disabled:opacity-50"
         >
           Annuler
         </button>
         <button
-          onClick={() => setContactVisible(false)}
-          className="px-4 py-2 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+          onClick={handleSendContact}
+          disabled={!contactMessage.trim() || sendingContact}
+          className="px-4 py-2 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Envoyer
+          {sendingContact ? "Envoi…" : "Envoyer"}
         </button>
       </div>
+    </div>
+  </div>
+)}
+
+{/* Modal Modifier mon profil */}
+{editVisible && editForm && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+    style={{ animation: "fadeIn 0.2s ease" }}>
+    <div className="bg-[#1a1d27] rounded-2xl p-6 w-full max-w-lg border border-white/10 shadow-2xl max-h-[85vh] overflow-y-auto"
+      style={{ animation: "popUp 0.3s cubic-bezier(0.34,1.56,0.64,1)" }}>
+      <h3 className="text-white font-bold text-lg mb-4">Modifier mon profil</h3>
+      <form onSubmit={handleSaveEdit} className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Prénom">
+            <input className={editInputCls} value={editForm.firstName}
+              onChange={(e) => setEditForm((f) => ({ ...f, firstName: e.target.value }))} />
+          </Field>
+          <Field label="Nom">
+            <input className={editInputCls} value={editForm.lastName}
+              onChange={(e) => setEditForm((f) => ({ ...f, lastName: e.target.value }))} />
+          </Field>
+        </div>
+
+        <Field label="Entreprise / Organisation">
+          <input className={editInputCls} value={editForm.company}
+            onChange={(e) => setEditForm((f) => ({ ...f, company: e.target.value }))} />
+        </Field>
+
+        <Field label="Titre affiché (tagline)">
+          <input className={editInputCls} value={editForm.tagline}
+            onChange={(e) => setEditForm((f) => ({ ...f, tagline: e.target.value }))} />
+        </Field>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Localisation">
+            <input className={editInputCls} value={editForm.location}
+              onChange={(e) => setEditForm((f) => ({ ...f, location: e.target.value }))} />
+          </Field>
+          <Field label="Fondée en">
+            <input className={editInputCls} value={editForm.founded}
+              onChange={(e) => setEditForm((f) => ({ ...f, founded: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Taille de l'équipe">
+            <input className={editInputCls} value={editForm.size}
+              onChange={(e) => setEditForm((f) => ({ ...f, size: e.target.value }))} />
+          </Field>
+          <Field label="Lien site web / LinkedIn">
+            <input className={editInputCls} placeholder="www.monsite.com" value={editForm.link}
+              onChange={(e) => setEditForm((f) => ({ ...f, link: e.target.value }))} />
+          </Field>
+        </div>
+
+        <Field label="Description">
+          <textarea rows={4} className={`${editInputCls} resize-none`} value={editForm.description}
+            onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))} />
+        </Field>
+
+        <Field label="Centres d'intérêt / secteurs (séparés par des virgules)">
+          <input className={editInputCls} placeholder="Tech, Finance, IA" value={editForm.interests}
+            onChange={(e) => setEditForm((f) => ({ ...f, interests: e.target.value }))} />
+        </Field>
+
+        <Field label="Tags affichés sur le profil (séparés par des virgules)">
+          <input className={editInputCls} placeholder="Startup, Seed, B2B" value={editForm.tags}
+            onChange={(e) => setEditForm((f) => ({ ...f, tags: e.target.value }))} />
+        </Field>
+
+        {editError && <p className="text-xs font-medium text-[#ff7043]">{editError}</p>}
+
+        <div className="flex gap-3 mt-2 justify-end">
+          <button
+            type="button"
+            onClick={() => setEditVisible(false)}
+            disabled={savingEdit}
+            className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 border border-white/10 hover:border-white/30 transition-colors disabled:opacity-50"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            disabled={savingEdit}
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {savingEdit ? "Enregistrement…" : "Enregistrer"}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 )}

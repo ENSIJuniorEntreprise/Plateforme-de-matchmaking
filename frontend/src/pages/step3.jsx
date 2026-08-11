@@ -3,6 +3,15 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
     setform({ ...form, [e.target.name]: e.target.value });
   };
 
+  const normalizeUrl = (e) => {
+    const value = e.target.value.trim();
+    if (value && !/^https?:\/\//i.test(value)) {
+      const normalized = `https://${value}`;
+      e.target.value = normalized; // évite que la validation native du <Enter> voie encore l'ancienne valeur
+      setform({ ...form, Lien: normalized });
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     nextStep();
@@ -49,6 +58,8 @@ function Formulaire2({ form, setform, nextStep, prevStep }) {
             required
             value={form.Lien}
             onChange={setvalues}
+            onBlur={normalizeUrl}
+            onKeyDown={(e) => { if (e.key === "Enter") normalizeUrl(e); }}
             className="w-full p-3 rounded-xl mt-1 placeholder-[#9093A3] border border-[#E5E7EB4D] focus:border-orange-500 focus:outline-none bg-[#333B4A] text-white"
           />
         </div>

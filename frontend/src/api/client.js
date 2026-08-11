@@ -44,6 +44,14 @@ export async function apiPatch(path, body) {
   return parseResponse(res);
 }
 
+export async function apiDelete(path) {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "DELETE",
+    headers: { ...authHeaders() },
+  });
+  return parseResponse(res);
+}
+
 // Les chemins renvoyés par le backend (cvUrl, avatarUrl, ...) sont relatifs
 // (ex: "/uploads/avatars/xxx.png") et doivent être résolus vers le serveur API.
 export function resolveAssetUrl(path) {

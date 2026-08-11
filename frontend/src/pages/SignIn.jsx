@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, User, Lock, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
 import { login as apiLogin } from "../api/auth";
+import { API_URL } from "../api/client";
 
 // ─── SVG icons ────────────────────────────────────────────────────────────────
 
@@ -80,7 +81,7 @@ function ReCaptcha({ checked, onChange }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function ConnexionPage({ onNavigate, onLogin }) {
+export default function ConnexionPage({ onNavigate, onLogin, notice }) {
   const [email, setEmail]                   = useState("");
   const [password, setPassword]             = useState("");
   const [showPassword, setShowPassword]     = useState(false);
@@ -91,7 +92,12 @@ export default function ConnexionPage({ onNavigate, onLogin }) {
   const [loadingGoogle,   setLoadingGoogle]   = useState(false);
   const [loadingLinkedIn, setLoadingLinkedIn] = useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState(notice || "");
+
+  // Reflète un message reçu depuis App.jsx suite à un retour OAuth (ex: provider non configuré)
+  useEffect(() => {
+    if (notice) setError(notice);
+  }, [notice]);
 
   // ── Validation ─────────────────────────────────────────────────────────────
   const emailValid    = email.trim().includes("@") && email.trim().length > 3;
@@ -117,12 +123,14 @@ export default function ConnexionPage({ onNavigate, onLogin }) {
 
   const handleGoogle = () => {
     if (anyLoading) return;
-    setError("Connexion Google non encore configurée.");
+    setLoadingGoogle(true);
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   const handleLinkedIn = () => {
     if (anyLoading) return;
-    setError("Connexion LinkedIn non encore configurée.");
+    setLoadingLinkedIn(true);
+    window.location.href = `${API_URL}/auth/linkedin`;
   };
 
   return (

@@ -314,9 +314,19 @@ function useScrollReveal(threshold = 0.15) {
   return [ref, visible];
 }
 
-export default function HeroPage() {
+export default function HeroPage({ onNavigate, user }) {
   const [sec2Ref, sec2Visible] = useScrollReveal(0.1);
   const [sec3Ref, sec3Visible] = useScrollReveal(0.1);
+
+  // La recherche de matchs exige d'être connecté (route backend protégée) :
+  // on envoie directement les visiteurs anonymes vers l'inscription.
+  const handleFindMatch = () => {
+    onNavigate && onNavigate(user ? "matchmaking" : "signup");
+  };
+
+  const handleDiscover = () => {
+    document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div style={{
@@ -446,10 +456,10 @@ export default function HeroPage() {
             Startups, talents &amp; investisseurs réunis par un moteur de matching intelligent. Trouvez vos partenaires idéaux en quelques clics.
           </p>
           <div className="fade-up-4" style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center", marginBottom: "80px" }}>
-            <button className="btn-primary" style={{ background: "#F97316", color: "#fff", border: "none", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 700, fontFamily: "'Inter', sans-serif", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 6px 24px rgba(232,76,10,0.28)" }}>
+            <button onClick={handleFindMatch} className="btn-primary" style={{ background: "#F97316", color: "#fff", border: "none", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 700, fontFamily: "'Inter', sans-serif", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 6px 24px rgba(232,76,10,0.28)", cursor: "pointer" }}>
               Trouver mon match <span>→</span>
             </button>
-            <button className="btn-outline" style={{ background: "transparent", color: "#F97316", border: "2px solid #F97316", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
+            <button onClick={handleDiscover} className="btn-outline" style={{ background: "transparent", color: "#F97316", border: "2px solid #F97316", borderRadius: "12px", padding: "16px 36px", fontSize: "1rem", fontWeight: 600, fontFamily: "'Inter', sans-serif", cursor: "pointer" }}>
               Découvrir la plateforme
             </button>
           </div>

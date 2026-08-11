@@ -152,7 +152,7 @@ export default function HowItWorks() {
         }
       `}</style>
 
-      <section ref={sectionRef} style={{ background: "#20222C", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 20px 100px", fontFamily: "'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
+      <section id="how-it-works" ref={sectionRef} style={{ background: "#20222C", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 20px 100px", fontFamily: "'Inter', sans-serif", position: "relative", overflow: "hidden" }}>
         <div style={{ textAlign: "center", marginBottom: 60, zIndex: 1 }}>
           <h2 className={`hiw-title${titleVisible ? " visible" : ""}`} style={{ margin: "0 0 14px", fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
             Comment ça <span className="text-shiny">fonctionne</span> ?

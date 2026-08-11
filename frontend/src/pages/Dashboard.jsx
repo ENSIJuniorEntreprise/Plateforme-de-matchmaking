@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Users, Eye, MessageSquare, TrendingUp, Zap, ChevronRight, Bell } from "lucide-react";
+import { Users, Eye, MessageSquare, TrendingUp, Zap, ChevronRight, Bell, UserPlus, Check, X } from "lucide-react";
 import "../styles/dashboard-animations.css";
 import { apiGet, apiPatch, resolveAssetUrl } from "../api/client";
 
@@ -119,12 +119,53 @@ function EmptyState({ text }) {
   );
 }
 
+function ConnectionRequestCard({ connection, index, busy, onRespond }) {
+  const requester = connection.requester;
+  const roleMeta = ROLE_META[requester?.role] || { icon: "👤", label: requester?.role };
+  const name = requester?.company || `${requester?.firstName || ""} ${requester?.lastName || ""}`.trim() || "Utilisateur";
+
+  return (
+    <div
+      style={{ animationDelay: `${index * 120}ms` }}
+      className="animate-drop-bounce flex flex-wrap items-center gap-[12px] rounded-[14px] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] px-[14px] py-[12px] transition-all duration-300"
+    >
+      <MatchAvatar match={{ avatarUrl: requester?.avatarUrl, name }} />
+      <div className="min-w-0 flex-1">
+        <div className="font-sora truncate text-[0.95rem] font-bold text-white">{name}</div>
+        <div className="font-sora mt-[2px] text-[0.78rem] font-semibold text-[#6b7280]">
+          {roleMeta.icon} {roleMeta.label} · {connection.compatibilityScore}% compatibilité
+        </div>
+      </div>
+      <div className="flex shrink-0 gap-[8px]">
+        <button
+          disabled={busy}
+          onClick={() => onRespond(connection._id, "accepted")}
+          className="font-sora flex cursor-pointer items-center gap-[6px] rounded-[10px] border-none bg-[#FF540B] px-[14px] py-[8px] text-[0.78rem] font-bold text-white transition-all duration-200 hover:bg-[#e04800] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Check strokeWidth={2.5} className="h-[14px] w-[14px]" />
+          {busy ? "..." : "Accepter"}
+        </button>
+        <button
+          disabled={busy}
+          onClick={() => onRespond(connection._id, "declined")}
+          className="font-sora flex cursor-pointer items-center gap-[6px] rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-transparent px-[14px] py-[8px] text-[0.78rem] font-bold text-[#9ca3af] transition-all duration-200 hover:border-[rgba(255,255,255,0.25)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <X strokeWidth={2.5} className="h-[14px] w-[14px]" />
+          {busy ? "..." : "Refuser"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Dashboard({ onNavigate, user }) {
   const [stats, setStats] = useState(null);
   const [matches, setMatches] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [respondingId, setRespondingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -135,15 +176,22 @@ export default function Dashboard({ onNavigate, user }) {
       setLoading(true);
       setError("");
       try {
-        const [statsRes, matchesRes, notifRes] = await Promise.all([
+        const [statsRes, matchesRes, notifRes, connectionsRes] = await Promise.all([
           apiGet("/dashboard/stats"),
           apiGet("/dashboard/recent-matches"),
           apiGet("/dashboard/notifications"),
+          apiGet("/matches/connections?status=pending"),
         ]);
         if (cancelled) return;
         setStats(statsRes.stats);
         setMatches(matchesRes.matches || []);
         setNotifications(notifRes.notifications || []);
+        // Seules les demandes où l'utilisateur connecté est le destinataire
+        setPendingRequests(
+          (connectionsRes.connections || []).filter(
+            (c) => String(c.recipient?._id || c.recipient) === String(user?._id)
+          )
+        );
       } catch (err) {
         if (!cancelled) setError(err.message || "Impossible de charger le tableau de bord.");
       } finally {
@@ -153,7 +201,19 @@ export default function Dashboard({ onNavigate, user }) {
 
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [user?._id]);
+
+  const respondToRequest = async (id, status) => {
+    setRespondingId(id);
+    try {
+      await apiPatch(`/matches/connections/${id}`, { status });
+      setPendingRequests((prev) => prev.filter((c) => c._id !== id));
+    } catch {
+      // échec réseau : la demande reste affichée, l'utilisateur peut réessayer
+    } finally {
+      setRespondingId(null);
+    }
+  };
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -252,6 +312,30 @@ export default function Dashboard({ onNavigate, user }) {
             </div>
           </div>
         </div>
+
+        {/* ── Demandes reçues ── */}
+        {!loading && pendingRequests.length > 0 && (
+          <div className="mb-[40px] rounded-[20px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-[20px] backdrop-blur-md sm:mb-[48px] sm:p-[28px]">
+            <div className="mb-[18px] flex items-center gap-[10px]">
+              <UserPlus className="h-5 w-5 text-[#FF540B]" />
+              <h2 className="m-0 text-[1rem] font-extrabold text-white sm:text-[1.05rem]">Demandes reçues</h2>
+              <span className="font-sora flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-[#FF540B] px-[6px] text-[0.7rem] font-extrabold text-white">
+                {pendingRequests.length}
+              </span>
+            </div>
+            <div className="flex flex-col gap-[10px]">
+              {pendingRequests.map((c, i) => (
+                <ConnectionRequestCard
+                  key={c._id}
+                  connection={c}
+                  index={i}
+                  busy={respondingId === c._id}
+                  onRespond={respondToRequest}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── CTA Banner ── */}
         <div className="animate-cta-bounce relative z-1 overflow-hidden rounded-[20px] border border-[rgba(255,84,11,0.15)] bg-[rgba(255,255,255,0.03)] px-[20px] py-[36px] text-center sm:px-[28px] sm:py-[40px] backdrop-blur-md transition-[box-shadow,transform] duration-300 hover:shadow-[0_0_30px_rgba(255,84,11,0.4)] hover:z-10" style={{ animationDelay: '-1.2s' }}>

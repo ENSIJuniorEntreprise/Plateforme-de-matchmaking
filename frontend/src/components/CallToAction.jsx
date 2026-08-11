@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function CallToAction() {
+export default function CallToAction({ onNavigate }) {
   const sectionRef = useRef(null);
   const [titleVisible, setTitleVisible] = useState(false);
   const [subVisible, setSubVisible] = useState(false);
@@ -75,7 +75,7 @@ export default function CallToAction() {
         </p>
 
         <div className={`cta-btn-wrap${btnVisible ? " visible" : ""}`} style={{ position: "relative", zIndex: 2 }}>
-          <button className="cta-btn">
+          <button className="cta-btn" onClick={() => onNavigate && onNavigate("signup")}>
             Créer mon profil gratuitement <span style={{ fontSize: 22 }}>→</span>
           </button>
         </div>

@@ -122,4 +122,61 @@ const listUsers = async (req, res, next) => {
   }
 };
 
-module.exports = { getUserById, updateMe, uploadCv, uploadAvatar, listUsers };
+// @desc    Ajouter un utilisateur aux favoris
+// @route   POST /api/users/me/favorites/:userId
+// @access  Private
+const addFavorite = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (userId === String(req.user._id)) {
+      return res.status(400).json({ success: false, message: "Action impossible sur son propre profil" });
+    }
+
+    const target = await User.findById(userId);
+    if (!target) {
+      return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+    }
+
+    await User.findByIdAndUpdate(req.user._id, { $addToSet: { favorites: userId } });
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Retirer un utilisateur des favoris
+// @route   DELETE /api/users/me/favorites/:userId
+// @access  Private
+const removeFavorite = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    await User.findByIdAndUpdate(req.user._id, { $pull: { favorites: userId } });
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Liste des profils favoris de l'utilisateur connecté (peuplés, pas juste les IDs)
+// @route   GET /api/users/me/favorites
+// @access  Private
+const getFavorites = async (req, res, next) => {
+  try {
+    const me = await User.findById(req.user._id).populate("favorites");
+    const favorites = (me.favorites || []).map((u) => u.toPublicProfile());
+    res.json({ success: true, favorites });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  getUserById,
+  updateMe,
+  uploadCv,
+  uploadAvatar,
+  listUsers,
+  addFavorite,
+  removeFavorite,
+  getFavorites,
+};

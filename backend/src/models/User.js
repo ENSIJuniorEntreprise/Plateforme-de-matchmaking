@@ -74,6 +74,7 @@ const userSchema = new mongoose.Schema(
 
     profileViews: { type: Number, default: 0 },
     isVerified: { type: Boolean, default: false },
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     // Auth utils
     resetPasswordToken: { type: String, select: false },

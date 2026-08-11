@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Sparkles, User, ChevronRight } from "lucide-react";
+import { Sparkles, User, ChevronRight, Star } from "lucide-react";
 
 // ─── Variant config ───────────────────────────────────────────────────────────
 
 const AUTH_PAGES      = ["signin", "signup"];
-const DASHBOARD_PAGES = ["profile", "settings", "forgot-password", "reset-password", "verify-email", "profile-edit", "email-preferences", "delete-account", "two-factor-auth", "sessions", "api-tokens"];
+const DASHBOARD_PAGES = ["profile", "favorites", "settings", "forgot-password", "reset-password", "verify-email", "profile-edit", "email-preferences", "delete-account", "two-factor-auth", "sessions", "api-tokens"];
 const DEFAULT_PAGES   = ["accueil", "matchmaking", "dashboard"];
 
 const NAVBAR_VARIANTS = {
@@ -56,18 +56,31 @@ const navItems = [
   { id: "accueil",     name: "Accueil",     icon: "home-outline"      },
   { id: "matchmaking", name: "Matchmaking", icon: "people-outline"    },
   { id: "dashboard",   name: "Dashboard",   icon: "bar-chart-outline" },
+  { id: "messages",    name: "Messages",    icon: "chatbubbles-outline" },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function Navbar({ currentPage, onNavigate, hideNav, variant, user }) {
+export default function Navbar({ currentPage, onNavigate, hideNav, variant, user, onLogout }) {
   useIonicons();
   const [active, setActive]               = useState(currentPage || "accueil");
   const [mobileOpen, setMobileOpen]       = useState(false);
+  const [userMenuOpen, setUserMenuOpen]   = useState(false);
   const [indicatorLeft, setIndicatorLeft] = useState(null);
 
   const ulRef       = useRef(null);
   const itemRefs    = useRef([]);
+  const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (currentPage) setActive(currentPage);
@@ -216,21 +229,42 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
 
           {/* ── Right area ── */}
           <div className="flex items-center justify-self-end gap-[20px]">
-            {user && currentPage !== "profile" ? (
-              <div className="flex items-center gap-[10px]">
-                <div className="hidden items-center gap-[8px] sm:flex">
+            {user ? (
+              <div className="relative flex items-center" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  className="font-inter flex cursor-pointer items-center gap-[8px] rounded-full py-[3px] pl-[3px] pr-[4px] transition-colors duration-200 hover:bg-[rgba(255,255,255,0.06)] sm:pr-[10px]"
+                >
                   <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#FF540B]">
                     <User strokeWidth={2} className="h-4 w-4 text-white" />
                   </div>
-                  <span className="font-inter text-[14px] font-semibold text-white">{user.fullName || user.name}</span>
-                </div>
-                <button
-                  className="font-inter flex cursor-pointer items-center gap-[6px] rounded-[12px] border-[1.5px] border-[#FF540B] bg-transparent px-[14px] py-[7px] text-[13px] font-semibold text-[#FF540B] transition-all duration-200 hover:bg-[rgba(255,84,11,0.10)]"
-                  onClick={() => handleNav("profile")}
-                >
-                  Visiter mon profil
-                  <ChevronRight strokeWidth={2.5} className="h-4 w-4" />
+                  <span className="hidden text-[14px] font-semibold text-white sm:inline">{user.fullName || user.name}</span>
                 </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-[46px] z-[200] w-[210px] rounded-[14px] border border-[#2a2d35] bg-[#20222C] p-[6px] shadow-2xl">
+                    <button
+                      onClick={() => { setUserMenuOpen(false); handleNav("profile"); }}
+                      className="font-inter flex w-full cursor-pointer items-center justify-between gap-[10px] rounded-[10px] px-[12px] py-[10px] text-left text-[13px] font-semibold text-white transition-colors duration-200 hover:bg-[#2a2d3e] hover:text-[#FF540B]"
+                    >
+                      Visiter mon profil
+                      <ChevronRight strokeWidth={2.5} className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => { setUserMenuOpen(false); handleNav("favorites"); }}
+                      className="font-inter flex w-full cursor-pointer items-center gap-[10px] rounded-[10px] px-[12px] py-[10px] text-left text-[13px] font-semibold text-white transition-colors duration-200 hover:bg-[#2a2d3e] hover:text-[#FF540B]"
+                    >
+                      <Star strokeWidth={2} className="h-4 w-4" />
+                      Mes favoris
+                    </button>
+                    <button
+                      onClick={() => { setUserMenuOpen(false); onLogout && onLogout(); }}
+                      className="font-inter flex w-full cursor-pointer items-center gap-[10px] rounded-[10px] px-[12px] py-[10px] text-left text-[13px] font-semibold text-[#ff6b6b] transition-colors duration-200 hover:bg-[rgba(255,84,11,0.10)]"
+                    >
+                      Se déconnecter
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -286,6 +320,14 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
                 {item.name}
               </button>
             ))}
+            {user && (
+              <button
+                onClick={() => { setMobileOpen(false); onLogout && onLogout(); }}
+                className="mt-[8px] flex w-full items-center gap-[12px] rounded-[10px] border-t border-[#2a2d35] px-[14px] py-[12px] pt-[16px] text-[15px] font-semibold text-[#ff6b6b] transition-colors duration-200 hover:bg-[#2a2d3e]"
+              >
+                Se déconnecter
+              </button>
+            )}
           </div>
         )}
       </header>
