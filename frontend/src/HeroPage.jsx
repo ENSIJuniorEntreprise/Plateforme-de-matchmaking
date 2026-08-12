@@ -59,17 +59,6 @@ function StarCanvas() {
   );
 }
 
-function Stat({ value, label }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-      <span className="text-shiny" style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, letterSpacing: "-0.02em" }}>
-        {value}
-      </span>
-      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem", whiteSpace: "nowrap" }}>{label}</span>
-    </div>
-  );
-}
-
 function MatchingGraph() {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
@@ -463,12 +452,19 @@ export default function HeroPage({ onNavigate, user }) {
               Découvrir la plateforme
             </button>
           </div>
-          <div className="fade-up-5 stats-grid">
-            <Stat value="2,500+" label="Projets connectés" />
-            <Stat value="850+"   label="Investisseurs actifs" />
-            <Stat value="95%"    label="Taux de satisfaction" />
-            <Stat value="€50M+"  label="Levées de fonds" />
-          </div>
+          <p
+            className="fade-up-5"
+            style={{
+              color: "rgba(255,255,255,0.55)",
+              fontSize: "1rem",
+              maxWidth: "560px",
+              textAlign: "center",
+              lineHeight: 1.6,
+            }}
+          >
+            Une nouvelle plateforme de matchmaking B2B — rejoignez les premières startups,
+            investisseurs et incubateurs qui la construisent avec nous.
+          </p>
           <div className="bounce" style={{ marginTop: "56px", width: "28px", height: "44px", border: "2px solid rgba(255,255,255,0.25)", borderRadius: "14px", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "6px" }}>
             <div style={{ width: "4px", height: "8px", background: "rgba(255,255,255,0.4)", borderRadius: "2px" }} />
           </div>

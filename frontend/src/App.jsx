@@ -14,6 +14,25 @@ import Dashboard from './pages/Dashboard.jsx'
 import Accueil from './pages/Accueil.jsx'
 import Messages from './pages/Messages.jsx'
 import Favorites from './pages/Favorites.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
+import ComingSoon from './pages/ComingSoon.jsx'
+
+// Titre affiché par la page "coming soon" partagée pour chaque destination pas encore construite.
+const COMING_SOON_TITLES = {
+  settings: 'Paramètres',
+  'verify-email': "Vérification de l'email",
+  'profile-edit': 'Modifier le profil',
+  'email-preferences': "Préférences d'emails",
+  'delete-account': 'Supprimer mon compte',
+  'two-factor-auth': 'Authentification à deux facteurs',
+  sessions: 'Sessions actives',
+  'api-tokens': 'Jetons API',
+}
+
+// /profile/:id est la seule route profonde gérée pour l'instant (nécessaire pour que le lien
+// "Partager" d'un profil fonctionne) — une migration complète vers react-router reste à faire.
+const parseProfilePath = (pathname) => pathname.match(/^\/profile\/([a-zA-Z0-9]+)$/)
 
 function App() {
   const [route, setRoute] = useState('accueil')
@@ -34,6 +53,9 @@ function App() {
   }) // null = logged out, { ...profil } = connecté
   // Message à afficher sur la page de connexion suite à un retour OAuth (succès ou erreur)
   const [oauthNotice, setOauthNotice] = useState("")
+  // Token de réinitialisation connu au moment de la navigation vers 'reset-password'
+  // (ex: depuis le lien "dev" de ForgotPassword tant qu'aucun email n'est réellement envoyé)
+  const [resetToken, setResetToken] = useState(null)
 
   const OAUTH_ERROR_MESSAGES = {
     google_not_configured: "Connexion Google non encore configurée.",
@@ -69,6 +91,32 @@ function App() {
     }
   }, [])
 
+  // Résout /profile/:id au chargement (ex: lien "Partager" ouvert dans un nouvel onglet).
+  useEffect(() => {
+    const match = parseProfilePath(window.location.pathname)
+    if (match) {
+      setRoute('profile')
+      setViewedUserId(match[1])
+    }
+  }, [])
+
+  // Bouton précédent/suivant du navigateur — synchronise route/viewedUserId avec l'URL réelle.
+  useEffect(() => {
+    const handlePopState = () => {
+      const match = parseProfilePath(window.location.pathname)
+      if (match) {
+        setRoute('profile')
+        setViewedUserId(match[1])
+        return
+      }
+      const page = window.location.pathname === '/' ? 'accueil' : window.location.pathname.slice(1)
+      setRoute(page)
+      setViewedUserId(null)
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   const handleLogin = ({ user: userData, token }) => {
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
@@ -89,6 +137,15 @@ function App() {
     setViewedUserId(page === 'profile' ? params?.userId || null : null)
     setViewedMatchScore(page === 'profile' && typeof params?.compatibilityScore === 'number' ? params.compatibilityScore : null)
     setMessagesContactId(page === 'messages' ? params?.contactId || null : null)
+    setResetToken(page === 'reset-password' ? params?.resetToken || null : null)
+
+    // Reflète la route dans l'URL (support minimal — pas encore une migration react-router complète)
+    // pour que les liens profonds comme "Partager un profil" pointent vers une page réelle.
+    const path =
+      page === 'accueil' ? '/' : page === 'profile' && params?.userId ? `/profile/${params.userId}` : `/${page}`
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path)
+    }
   }
 
   const renderPage = () => {
@@ -107,6 +164,19 @@ function App() {
         return <Messages onNavigate={handleNavigate} user={user} initialContactId={messagesContactId} />
       case 'favorites':
         return <Favorites onNavigate={handleNavigate} user={user} />
+      case 'forgot-password':
+        return <ForgotPassword onNavigate={handleNavigate} />
+      case 'reset-password':
+        return <ResetPassword onNavigate={handleNavigate} onLogin={handleLogin} resetToken={resetToken} />
+      case 'settings':
+      case 'verify-email':
+      case 'profile-edit':
+      case 'email-preferences':
+      case 'delete-account':
+      case 'two-factor-auth':
+      case 'sessions':
+      case 'api-tokens':
+        return <ComingSoon title={COMING_SOON_TITLES[route]} onNavigate={handleNavigate} />
       case 'accueil':
       default:
         return <Accueil onNavigate={handleNavigate} user={user} />

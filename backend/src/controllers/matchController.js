@@ -1,7 +1,11 @@
 const User = require("../models/User");
 const Connection = require("../models/Connection");
 const Notification = require("../models/Notification");
-const { computeCompatibility } = require("../utils/compatibility");
+const { computeCompatibilityBreakdown } = require("../utils/compatibility");
+
+// Échappe les métacaractères regex avant d'injecter une entrée utilisateur dans un `new RegExp()`,
+// sinon une entrée comme "(a+)+$" atteint le moteur regex de Mongo tel quel (ReDoS / regex injection).
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // @desc    Recherche de profils avec filtres (page Matchmaking.jsx)
 // @route   POST /api/matches/search
@@ -25,25 +29,42 @@ const searchMatches = async (req, res, next) => {
 
     if (profileType) filter.role = profileType;
     if (sectors.length) filter.interests = { $in: sectors };
-    if (stage) filter.stage = stage;
-    if (location) filter.location = new RegExp(location, "i");
-    if (budgetRange) filter.budgetRange = budgetRange;
+    // `stage` n'a de sens que côté startup et `budgetRange` que côté investisseur/incubateur :
+    // les appliquer au rôle recherché quand il ne porte pas ce champ (toujours vide) reviendrait
+    // à garantir zéro résultat, ex. chercher des investisseurs avec un filtre `stage` renseigné.
+    if (stage && profileType === "startup") filter.stage = stage;
+    if (budgetRange && ["investisseur", "incubateur"].includes(profileType)) filter.budgetRange = budgetRange;
+    if (location) {
+      // Le frontend envoie plusieurs localisations jointes par "|" pour un OU logique
+      // (ex: "Tunisia|MENA"). On échappe chaque terme séparément puis on rejoint avec "|"
+      // pour garder l'alternance regex sans réintroduire l'injection.
+      const alternatives = location
+        .split("|")
+        .map((part) => escapeRegex(part.trim()))
+        .filter(Boolean);
+      if (alternatives.length) filter.location = new RegExp(alternatives.join("|"), "i");
+    }
     if (query) {
+      const safeQuery = new RegExp(escapeRegex(query), "i");
       filter.$or = [
-        { firstName: new RegExp(query, "i") },
-        { lastName: new RegExp(query, "i") },
-        { company: new RegExp(query, "i") },
-        { description: new RegExp(query, "i") },
-        { tags: new RegExp(query, "i") },
+        { firstName: safeQuery },
+        { lastName: safeQuery },
+        { company: safeQuery },
+        { description: safeQuery },
+        { tags: safeQuery },
       ];
     }
 
     let candidates = await User.find(filter);
 
-    let results = candidates.map((candidate) => ({
-      ...candidate.toPublicProfile(),
-      compatibilityScore: computeCompatibility(req.user, candidate),
-    }));
+    let results = candidates.map((candidate) => {
+      const breakdown = computeCompatibilityBreakdown(req.user, candidate);
+      return {
+        ...candidate.toPublicProfile(),
+        compatibilityScore: breakdown.total,
+        compatibilityBreakdown: breakdown,
+      };
+    });
 
     if (sortBy === "compatibilite") {
       results.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
@@ -93,12 +114,12 @@ const sendConnectionRequest = async (req, res, next) => {
       return res.status(409).json({ success: false, message: "Demande déjà envoyée", connection: existing });
     }
 
-    const score = computeCompatibility(req.user, recipient);
+    const breakdown = computeCompatibilityBreakdown(req.user, recipient);
 
     const connection = await Connection.create({
       requester: req.user._id,
       recipient: userId,
-      compatibilityScore: score,
+      compatibilityScore: breakdown.total,
       message,
     });
 
@@ -106,12 +127,12 @@ const sendConnectionRequest = async (req, res, next) => {
       user: userId,
       type: "match",
       title: "Nouveau match !",
-      detail: `${req.user.fullName || req.user.firstName} souhaite se connecter avec vous (${score}% de compatibilité).`,
+      detail: `${req.user.fullName || req.user.firstName} souhaite se connecter avec vous (${breakdown.total}% de compatibilité).`,
       icon: "🎯",
       relatedUser: req.user._id,
     });
 
-    res.status(201).json({ success: true, connection });
+    res.status(201).json({ success: true, connection, compatibilityBreakdown: breakdown });
   } catch (err) {
     next(err);
   }

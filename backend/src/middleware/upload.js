@@ -15,9 +15,20 @@ const makeStorage = (subfolder) => {
   });
 };
 
+// Extension ET mimetype doivent correspondre — un fichier renommé en .pdf mais dont le
+// Content-Type ne colle pas à un format attendu est rejeté (l'extension seule est falsifiable).
+const CV_MIME_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+const IMAGE_MIME_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/avif"];
+
 const cvFileFilter = (req, file, cb) => {
-  const allowed = [".pdf", ".doc", ".docx"];
-  if (allowed.includes(path.extname(file.originalname).toLowerCase())) {
+  const allowedExt = [".pdf", ".doc", ".docx"];
+  const extOk = allowedExt.includes(path.extname(file.originalname).toLowerCase());
+  const mimeOk = CV_MIME_TYPES.includes(file.mimetype);
+  if (extOk && mimeOk) {
     cb(null, true);
   } else {
     cb(new Error("Format de CV non supporté (pdf, doc, docx uniquement)"));
@@ -25,8 +36,10 @@ const cvFileFilter = (req, file, cb) => {
 };
 
 const imageFileFilter = (req, file, cb) => {
-  const allowed = [".png", ".jpg", ".jpeg", ".webp", ".svg", ".avif"];
-  if (allowed.includes(path.extname(file.originalname).toLowerCase())) {
+  const allowedExt = [".png", ".jpg", ".jpeg", ".webp", ".svg", ".avif"];
+  const extOk = allowedExt.includes(path.extname(file.originalname).toLowerCase());
+  const mimeOk = IMAGE_MIME_TYPES.includes(file.mimetype);
+  if (extOk && mimeOk) {
     cb(null, true);
   } else {
     cb(new Error("Format d'image non supporté"));

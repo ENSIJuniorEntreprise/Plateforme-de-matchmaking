@@ -128,7 +128,8 @@ const forgotPassword = async (req, res, next) => {
     res.json({
       success: true,
       message: "Si ce compte existe, un email de réinitialisation a été envoyé.",
-      // resetToken renvoyé uniquement en développement pour faciliter les tests
+      // Limite connue (Sprint 1) : aucun service d'envoi d'email n'est branché,
+      // donc resetToken n'est renvoyé qu'en dev pour rester testable manuellement.
       ...(process.env.NODE_ENV === "development" && { resetToken }),
     });
   } catch (err) {

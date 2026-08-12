@@ -42,3 +42,21 @@ export async function register(form) {
   });
   return parseResponse(res);
 }
+
+export async function forgotPassword(email) {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return parseResponse(res);
+}
+
+export async function resetPassword(token, password) {
+  const res = await fetch(`${API_URL}/auth/reset-password/${token}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  return parseResponse(res);
+}

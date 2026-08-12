@@ -1,6 +1,12 @@
 const Message = require("../models/Message");
+const Connection = require("../models/Connection");
 const Notification = require("../models/Notification");
 const mongoose = require("mongoose");
+
+// Startups et talents doivent attendre qu'une demande de mise en relation soit acceptée
+// avant de pouvoir écrire à quelqu'un. Investisseurs et incubateurs peuvent démarcher
+// librement, demande acceptée ou non.
+const ROLES_REQUIRING_ACCEPTED_CONNECTION = ["startup", "talent"];
 
 // @desc    Liste des conversations de l'utilisateur (dernier message par contact)
 // @route   GET /api/messages/conversations
@@ -95,6 +101,22 @@ const sendMessage = async (req, res, next) => {
     }
     if (!mongoose.isValidObjectId(userId)) {
       return res.status(400).json({ success: false, message: "Destinataire invalide" });
+    }
+
+    if (ROLES_REQUIRING_ACCEPTED_CONNECTION.includes(req.user.role)) {
+      const connection = await Connection.findOne({
+        $or: [
+          { requester: req.user._id, recipient: userId },
+          { requester: userId, recipient: req.user._id },
+        ],
+      });
+
+      if (!connection || connection.status !== "accepted") {
+        return res.status(403).json({
+          success: false,
+          message: "Vous pourrez envoyer un message dès que votre demande de mise en relation aura été acceptée.",
+        });
+      }
     }
 
     const message = await Message.create({

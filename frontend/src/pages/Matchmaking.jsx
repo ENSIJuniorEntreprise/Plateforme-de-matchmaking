@@ -207,6 +207,15 @@ const ROLE_AVATAR_GRADIENT = {
   incubateur: 'bg-[radial-gradient(circle_at_top,#e1d7ff_0%,#8d7ef1_45%,#3d348f_100%)]',
 }
 
+// Libellés affichés pour chaque facteur du score renvoyé par
+// POST /matches/search (`match.compatibilityBreakdown`).
+const BREAKDOWN_LABELS = {
+  role: 'Rôle',
+  sector: 'Secteur',
+  stageBudget: 'Stade / Budget',
+  location: 'Localisation',
+}
+
 const mapSortBy = (label) => {
   if (label === 'Par proximité') return 'proximite'
   if (label === 'Par budget') return 'budget'
@@ -388,6 +397,7 @@ const Matchmaking = ({ onNavigate }) => {
   const [matchesError, setMatchesError] = useState('')
   const [sortLoading, setSortLoading] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState({})
+  const [expandedBreakdown, setExpandedBreakdown] = useState({})
   const sectorMenuRef = useRef(null)
   const locationMenuRef = useRef(null)
   const sortMenuRef = useRef(null)
@@ -520,6 +530,10 @@ const Matchmaking = ({ onNavigate }) => {
     } finally {
       setSortLoading(false)
     }
+  }
+
+  const toggleBreakdown = (userId) => {
+    setExpandedBreakdown((prev) => ({ ...prev, [userId]: !prev[userId] }))
   }
 
   const handleConnect = async (userId) => {
@@ -1024,6 +1038,40 @@ const Matchmaking = ({ onNavigate }) => {
                                 {tag}
                               </span>
                             ))}
+                          </div>
+                        )}
+
+                        {match.compatibilityBreakdown && (
+                          <div className="mt-4">
+                            <button
+                              type="button"
+                              onClick={() => toggleBreakdown(match._id)}
+                              className="flex items-center gap-1.5 text-xs font-semibold text-[#FF7033]"
+                            >
+                              Pourquoi ce match ?
+                              <ChevronDownIcon
+                                className={`h-3.5 w-3.5 transition ${expandedBreakdown[match._id] ? 'rotate-180' : ''}`}
+                              />
+                            </button>
+
+                            {expandedBreakdown[match._id] && (
+                              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+                                {Object.entries(BREAKDOWN_LABELS).map(([key, label]) => (
+                                  <div key={key}>
+                                    <div className="flex items-center justify-between text-[11px] font-semibold text-[#8B8F9A]">
+                                      <span>{label}</span>
+                                      <span className="text-[#16181F]">{match.compatibilityBreakdown[key]}%</span>
+                                    </div>
+                                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#E4E4E7]">
+                                      <div
+                                        className="h-full rounded-full bg-[#FF7033]"
+                                        style={{ width: `${match.compatibilityBreakdown[key]}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         )}
 
