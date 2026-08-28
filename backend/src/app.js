@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const matchRoutes = require("./routes/matchRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 const { authLimiter, apiLimiter } = require("./middleware/rateLimiters");
 
@@ -41,6 +42,7 @@ app.use("/api/auth", authLimiter);
 app.use("/api/matches", apiLimiter);
 app.use("/api/messages", apiLimiter);
 app.use("/api/users", apiLimiter);
+app.use("/api/admin", apiLimiter);
 
 // Fichiers statiques (CVs, avatars uploadés)
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
@@ -53,6 +55,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/matches", matchRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Sparkles, User, ChevronRight, Star } from "lucide-react";
+import { Sparkles, User, ChevronRight, Star, ShieldCheck } from "lucide-react";
 
 // ─── Variant config ───────────────────────────────────────────────────────────
 
 const AUTH_PAGES      = ["signin", "signup"];
-const DASHBOARD_PAGES = ["profile", "favorites", "settings", "forgot-password", "reset-password", "verify-email", "profile-edit", "email-preferences", "delete-account", "two-factor-auth", "sessions", "api-tokens"];
+const DASHBOARD_PAGES = ["profile", "favorites", "settings", "forgot-password", "reset-password", "verify-email", "profile-edit", "email-preferences", "delete-account", "two-factor-auth", "sessions", "api-tokens", "admin"];
 const DEFAULT_PAGES   = ["accueil", "matchmaking", "dashboard"];
 
 const NAVBAR_VARIANTS = {
@@ -257,6 +257,15 @@ export default function Navbar({ currentPage, onNavigate, hideNav, variant, user
                       <Star strokeWidth={2} className="h-4 w-4" />
                       Mes favoris
                     </button>
+                    {user.isAdmin && (
+                      <button
+                        onClick={() => { setUserMenuOpen(false); handleNav("admin"); }}
+                        className="font-inter flex w-full cursor-pointer items-center gap-[10px] rounded-[10px] px-[12px] py-[10px] text-left text-[13px] font-semibold text-white transition-colors duration-200 hover:bg-[#2a2d3e] hover:text-[#FF540B]"
+                      >
+                        <ShieldCheck strokeWidth={2} className="h-4 w-4" />
+                        Administration
+                      </button>
+                    )}
                     <button
                       onClick={() => { setUserMenuOpen(false); onLogout && onLogout(); }}
                       className="font-inter flex w-full cursor-pointer items-center gap-[10px] rounded-[10px] px-[12px] py-[10px] text-left text-[13px] font-semibold text-[#ff6b6b] transition-colors duration-200 hover:bg-[rgba(255,84,11,0.10)]"

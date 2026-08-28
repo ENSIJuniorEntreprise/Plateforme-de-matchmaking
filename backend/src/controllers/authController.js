@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const User = require("../models/User");
 const { ROLES } = require("../models/User");
 const { signToken } = require("../utils/token");
+const { isBootstrapAdminEmail } = require("../middleware/auth");
 
 const sendAuthResponse = (user, statusCode, res) => {
   const token = signToken(user._id);
@@ -82,6 +83,16 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ success: false, message: "Email ou mot de passe incorrect" });
+    }
+    if (user.isBanned) {
+      return res.status(403).json({ success: false, message: "Ce compte a été suspendu" });
+    }
+
+    // Synchronise isAdmin en base dès la connexion pour qu'il soit présent immédiatement
+    // dans la réponse (voir aussi middleware/auth.js protect, qui fait de même par la suite).
+    if (!user.isAdmin && isBootstrapAdminEmail(user.email)) {
+      user.isAdmin = true;
+      await user.save({ validateBeforeSave: false });
     }
 
     sendAuthResponse(user, 200, res);

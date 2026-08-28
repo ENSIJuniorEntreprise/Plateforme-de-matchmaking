@@ -17,6 +17,7 @@ import Favorites from './pages/Favorites.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import ComingSoon from './pages/ComingSoon.jsx'
+import Admin from './pages/Admin.jsx'
 
 // Titre affiché par la page "coming soon" partagée pour chaque destination pas encore construite.
 const COMING_SOON_TITLES = {
@@ -160,6 +161,8 @@ function App() {
         return <Profile onNavigate={handleNavigate} userId={viewedUserId} currentUser={user} matchScore={viewedMatchScore} />
       case 'dashboard':
         return <Dashboard onNavigate={handleNavigate} user={user} />
+      case 'admin':
+        return <Admin onNavigate={handleNavigate} user={user} />
       case 'messages':
         return <Messages onNavigate={handleNavigate} user={user} initialContactId={messagesContactId} />
       case 'favorites':

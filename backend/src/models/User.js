@@ -76,6 +76,10 @@ const userSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
+    // Administration (voir middleware/auth.js requireAdmin et controllers/adminController.js)
+    isAdmin: { type: Boolean, default: false },
+    isBanned: { type: Boolean, default: false },
+
     // Auth utils
     resetPasswordToken: { type: String, select: false },
     resetPasswordExpire: { type: Date, select: false },
