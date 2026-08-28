@@ -431,10 +431,6 @@ export default function HeroPage({ onNavigate, user }) {
       <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <div className="hero-glow" />
         <main style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 24px 40px", position: "relative", zIndex: 2 }}>
-          <div className="fade-up-1" style={{ display: "inline-flex", alignItems: "center", gap: "8px", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "999px", padding: "6px 16px", marginBottom: "40px", fontSize: "0.85rem", color: "rgba(255,255,255,0.75)", background: "rgba(255,255,255,0.04)" }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F97316", flexShrink: 0, boxShadow: "0 0 6px #F97316", display: "inline-block" }} />
-            La plateforme de matching #1 en France
-          </div>
           <h1 className="fade-up-2" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: "8px", color: "#fff" }}>
             Connectez-vous
           </h1>

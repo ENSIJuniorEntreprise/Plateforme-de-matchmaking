@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Connection = require("../models/Connection");
 const Notification = require("../models/Notification");
-const { computeCompatibilityBreakdown } = require("../utils/compatibility");
+const { computeCompatibilityBreakdown, buildIcebreaker } = require("../utils/compatibility");
 
 // Échappe les métacaractères regex avant d'injecter une entrée utilisateur dans un `new RegExp()`,
 // sinon une entrée comme "(a+)+$" atteint le moteur regex de Mongo tel quel (ReDoS / regex injection).
@@ -63,6 +63,7 @@ const searchMatches = async (req, res, next) => {
         ...candidate.toPublicProfile(),
         compatibilityScore: breakdown.total,
         compatibilityBreakdown: breakdown,
+        icebreaker: buildIcebreaker(breakdown, req.user, candidate),
       };
     });
 

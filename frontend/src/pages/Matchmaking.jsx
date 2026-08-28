@@ -398,6 +398,7 @@ const Matchmaking = ({ onNavigate }) => {
   const [sortLoading, setSortLoading] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState({})
   const [expandedBreakdown, setExpandedBreakdown] = useState({})
+  const [messageDrafts, setMessageDrafts] = useState({})
   const sectorMenuRef = useRef(null)
   const locationMenuRef = useRef(null)
   const sortMenuRef = useRef(null)
@@ -539,7 +540,7 @@ const Matchmaking = ({ onNavigate }) => {
   const handleConnect = async (userId) => {
     setConnectionStatus((prev) => ({ ...prev, [userId]: 'loading' }))
     try {
-      await apiPost(`/matches/connect/${userId}`)
+      await apiPost(`/matches/connect/${userId}`, { message: messageDrafts[userId] || '' })
       setConnectionStatus((prev) => ({ ...prev, [userId]: 'sent' }))
     } catch (err) {
       setConnectionStatus((prev) => ({ ...prev, [userId]: err.message || 'error' }))
@@ -1010,8 +1011,16 @@ const Matchmaking = ({ onNavigate }) => {
 
                           <div className="min-w-0 flex-1">
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[1.6rem]">
+                              <h3 className="flex items-center gap-1.5 text-[1.05rem] font-semibold leading-tight text-[#16181F] sm:text-[1.6rem]">
                                 {displayName}
+                                {match.isVerified && (
+                                  <span
+                                    title="Profil vérifié"
+                                    className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-[9px] font-bold text-white sm:h-5 sm:w-5 sm:text-[11px]"
+                                  >
+                                    ✓
+                                  </span>
+                                )}
                               </h3>
                               <span className="shrink-0 rounded-full bg-[#FF7033]/15 px-2.5 py-1 text-xs font-bold text-[#FF7033]">
                                 {match.compatibilityScore}%
@@ -1073,6 +1082,30 @@ const Matchmaking = ({ onNavigate }) => {
                               </div>
                             )}
                           </div>
+                        )}
+
+                        {match.icebreaker && (
+                          <div className="mt-4 rounded-[0.9rem] border border-[#FFD9BE] bg-[#FFF4EC] px-3 py-2.5">
+                            <p className="mb-1 text-[11px] font-bold text-[#FF7033]">💡 Suggestion de message</p>
+                            <p className="text-xs leading-snug text-[#5b5f6a]">{match.icebreaker}</p>
+                            <button
+                              type="button"
+                              onClick={() => setMessageDrafts((prev) => ({ ...prev, [match._id]: match.icebreaker }))}
+                              className="mt-1.5 text-[11px] font-semibold text-[#FF7033] underline"
+                            >
+                              Utiliser cette suggestion
+                            </button>
+                          </div>
+                        )}
+
+                        {messageDrafts[match._id] !== undefined && (
+                          <textarea
+                            value={messageDrafts[match._id]}
+                            onChange={(e) => setMessageDrafts((prev) => ({ ...prev, [match._id]: e.target.value }))}
+                            rows={2}
+                            placeholder="Votre message…"
+                            className="mt-3 w-full rounded-[0.9rem] border border-[#E4E4E7] bg-white px-3 py-2 text-xs text-[#16181F] outline-none focus:border-[#FF7033]"
+                          />
                         )}
 
                         <div className="mt-5 flex flex-col gap-2 overflow-hidden sm:max-h-0 sm:flex-row sm:transition-all sm:duration-500 sm:group-hover:max-h-[68px]">

@@ -9,8 +9,9 @@ const {
   addFavorite,
   removeFavorite,
   getFavorites,
+  verifyUser,
 } = require("../controllers/userController");
-const { protect } = require("../middleware/auth");
+const { protect, requireAdmin } = require("../middleware/auth");
 const { validate } = require("../middleware/validate");
 const { uploadCV, uploadAvatar: uploadAvatarMw } = require("../middleware/upload");
 const { STAGES, BUDGET_RANGES } = require("../models/User");
@@ -46,6 +47,7 @@ router.post("/me/avatar", protect, uploadAvatarMw.single("avatar"), uploadAvatar
 router.get("/me/favorites", protect, getFavorites);
 router.post("/me/favorites/:userId", protect, addFavorite);
 router.delete("/me/favorites/:userId", protect, removeFavorite);
+router.patch("/:id/verify", protect, requireAdmin, verifyUser);
 router.get("/:id", getUserById);
 
 module.exports = router;

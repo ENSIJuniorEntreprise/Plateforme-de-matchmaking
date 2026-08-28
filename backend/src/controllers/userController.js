@@ -170,6 +170,26 @@ const getFavorites = async (req, res, next) => {
   }
 };
 
+// @desc    Active/désactive le badge "Vérifié" d'un utilisateur (action admin)
+// @route   PATCH /api/users/:id/verify
+// @access  Private (admin — voir middleware/auth.js requireAdmin)
+const verifyUser = async (req, res, next) => {
+  try {
+    const { isVerified = true } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: Boolean(isVerified) },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+    }
+    res.json({ success: true, user: user.toPublicProfile() });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getUserById,
   updateMe,
@@ -179,4 +199,5 @@ module.exports = {
   addFavorite,
   removeFavorite,
   getFavorites,
+  verifyUser,
 };

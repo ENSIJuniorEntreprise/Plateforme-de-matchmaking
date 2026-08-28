@@ -12,6 +12,11 @@ const iconPaths = {
   bolt:     "M7 2v11h3v9l7-12h-4l4-8z",
   edit:     "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
 };
+
+// Vrai pour un lien de prise de rendez-vous (Calendly/Cal.com) — permet d'afficher "Prendre RDV"
+// plutôt que le libellé générique "Site web" quand c'est pertinent.
+const isSchedulingLink = (link = "") => /calendly\.com|cal\.com/i.test(link);
+const normalizeUrl = (link = "") => (/^https?:\/\//i.test(link) ? link : `https://${link}`);
 const Ico = ({ n, s = 14, c = "currentColor" }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill={c} className="shrink-0">
     <path d={iconPaths[n]} />
@@ -491,7 +496,17 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
 
             {/* Name + meta */}
             <div className="flex-1 min-w-[180px]">
-              <h1 className="text-white text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">{displayName}</h1>
+              <h1 className="flex items-center gap-2 text-white text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">
+                {displayName}
+                {profile.isVerified && (
+                  <span
+                    title="Profil vérifié"
+                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[11px] font-bold text-white"
+                  >
+                    ✓
+                  </span>
+                )}
+              </h1>
               {subtitle && <p className="text-gray-400 text-xm mt-0.5">{subtitle}</p>}
               {metaItems.length > 0 && (
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
@@ -540,6 +555,19 @@ export default function ProfilePage({ onNavigate, userId, currentUser, matchScor
     <Ico n="share" s={13} c="#fb923c" />
     Partager
   </button>
+
+  {/* Prendre RDV (lien Calendly/Cal.com) ou Site web */}
+  {profile.link && (
+    <a
+      href={normalizeUrl(profile.link)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-orange-500/60 text-orange-400 bg-transparent hover:border-orange-400 transition-all duration-200"
+    >
+      <Ico n={isSchedulingLink(profile.link) ? "calendar" : "share"} s={13} c="#fb923c" />
+      {isSchedulingLink(profile.link) ? "Prendre RDV" : "Site web"}
+    </a>
+  )}
 
   {/* Contacter */}
   {!isOwnProfile && (

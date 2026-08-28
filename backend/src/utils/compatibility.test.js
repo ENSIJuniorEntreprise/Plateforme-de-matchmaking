@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const {
   computeCompatibility,
   computeCompatibilityBreakdown,
+  buildIcebreaker,
   jaccard,
   ROLE_AFFINITY,
   STAGE_BUDGET_AFFINITY,
@@ -68,4 +69,29 @@ test("breakdown: stage/budget signal is neutral (50) when not applicable, not pe
 
 test("weights sum to 1 (role 0.4 + sector 0.3 + stageBudget 0.2 + location 0.1)", () => {
   assert.ok(Math.abs(0.4 + 0.3 + 0.2 + 0.1 - 1) < 1e-9);
+});
+
+test("buildIcebreaker: mentions the budget bracket when stage/budget is the strongest factor", () => {
+  const startup = { firstName: "Lina", interests: [], stage: "Pre-seed", budgetRange: "" };
+  const investor = { firstName: "Sami", interests: [], stage: "", budgetRange: "0-10M DT" };
+  const breakdown = computeCompatibilityBreakdown(startup, investor);
+
+  const text = buildIcebreaker(breakdown, startup, investor);
+  assert.match(text, /Sami/);
+  assert.match(text, /0-10M DT/);
+});
+
+test("buildIcebreaker: cites a shared interest when sector is the strongest factor", () => {
+  const userA = { firstName: "Alex", interests: ["FinTech", "SaaS"], stage: "", budgetRange: "" };
+  const userB = { firstName: "Sam", interests: ["fintech"], stage: "", budgetRange: "" };
+  const breakdown = computeCompatibilityBreakdown(userA, userB);
+
+  const text = buildIcebreaker(breakdown, userA, userB);
+  assert.match(text, /FinTech/i);
+});
+
+test("buildIcebreaker: never throws on fully empty profiles", () => {
+  const empty = { interests: [], stage: "", budgetRange: "" };
+  const breakdown = computeCompatibilityBreakdown(empty, empty);
+  assert.doesNotThrow(() => buildIcebreaker(breakdown, empty, empty));
 });

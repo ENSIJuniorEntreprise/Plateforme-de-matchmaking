@@ -30,6 +30,22 @@ const jaccard = (a = [], b = []) => {
   return intersection / union;
 };
 
+// Intersection "affichable" (garde la casse d'origine de `a`, dédupliquée), utilisée par
+// buildIcebreaker pour citer les secteurs réellement partagés plutôt qu'un simple score.
+const sharedItems = (a = [], b = []) => {
+  const setB = new Set(b.map((s) => s.toLowerCase()));
+  const seen = new Set();
+  const result = [];
+  for (const item of a) {
+    const lower = item.toLowerCase();
+    if (setB.has(lower) && !seen.has(lower)) {
+      seen.add(lower);
+      result.push(item);
+    }
+  }
+  return result;
+};
+
 const roleScore = (userA, userB) => (ROLE_AFFINITY[userA.role]?.[userB.role] ?? 0.3) * 100;
 
 const sectorScore = (userA, userB) => jaccard(userA.interests, userB.interests) * 100;
@@ -74,9 +90,41 @@ const computeCompatibilityBreakdown = (userA, userB) => {
 /** Raccourci pratique quand seul le score agrégé (0-100) est nécessaire. */
 const computeCompatibility = (userA, userB) => computeCompatibilityBreakdown(userA, userB).total;
 
+// Suggestion de premier message générée par template (pas d'appel LLM), réduisant la friction
+// du "pitch à froid" (cf. Tinder/Bumble/e27). Cascade de priorité par seuil plutôt qu'un simple
+// argmax sur les 4 facteurs : `stageBudget` a une valeur neutre (50) quand il ne s'applique pas
+// (ex: deux talents), donc un argmax naïf le ferait gagner par égalité même quand il ne veut rien
+// dire, masquant un vrai signal de secteur partagé.
+// `userA` = l'utilisateur qui consulte les résultats, `userB` = le profil suggéré.
+const buildIcebreaker = (breakdown, userA, userB) => {
+  const name = userB.firstName || userB.company || "vous";
+  const shared = sharedItems(userA.interests, userB.interests);
+
+  if (breakdown.stageBudget >= 70) {
+    const stage = userA.stage || userB.stage;
+    const budget = userA.budgetRange || userB.budgetRange;
+    return `Bonjour ${name}, votre stade${stage ? ` (${stage})` : ""} correspond bien à${
+      budget ? ` la fourchette d'investissement ${budget}` : " ce que vous recherchez"
+    }. Seriez-vous disponible pour échanger sur une collaboration ?`;
+  }
+
+  if (shared.length > 0) {
+    return `Bonjour ${name}, nous partageons un intérêt pour ${shared
+      .slice(0, 2)
+      .join(" et ")}. J'aimerais échanger sur une collaboration potentielle.`;
+  }
+
+  if (breakdown.role >= 70) {
+    return `Bonjour ${name}, votre profil correspond bien à ce que je recherche actuellement. Seriez-vous disponible pour un premier échange ?`;
+  }
+
+  return `Bonjour ${name}, votre profil m'intéresse — seriez-vous disponible pour échanger ?`;
+};
+
 module.exports = {
   computeCompatibility,
   computeCompatibilityBreakdown,
+  buildIcebreaker,
   jaccard,
   ROLE_AFFINITY,
   STAGE_BUDGET_AFFINITY,
